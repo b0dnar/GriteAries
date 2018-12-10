@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using GriteAries.BK.Parse;
 
 namespace GriteAries.Controllers
 {
@@ -10,6 +11,8 @@ namespace GriteAries.Controllers
     {
         public ActionResult Index()
         {
+            Marathon marathon = new Marathon();
+            marathon.ParseLiveFootball();
             ViewBag.Title = "Home Page";
 
             return View();

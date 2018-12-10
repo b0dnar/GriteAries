@@ -12,7 +12,7 @@ namespace GriteAries.Controllers
         public ActionResult Index()
         {
             Marathon marathon = new Marathon();
-            marathon.ParseLiveFootball();
+            marathon.ParseLiveHockey();
             ViewBag.Title = "Home Page";
 
             return View();

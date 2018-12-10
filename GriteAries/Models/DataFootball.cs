@@ -7,10 +7,10 @@ namespace GriteAries.Models
 {
     public class DataFootball : Data
     {
-        public float X { get; set; }
-        public float X1 {get;set;}
-        public float X2 { get; set; }
-        public float P12 { get; set; }
+        public ValueBK X { get; set; }
+        public ValueBK X1 {get;set;}
+        public ValueBK X2 { get; set; }
+        public ValueBK P12 { get; set; }
         public List<Fora> AsiatForas { get; set; }
         public List<Handicap> Handicaps { get; set; }
         public List<Total> AsiatTotals { get; set; }
@@ -19,6 +19,22 @@ namespace GriteAries.Models
         public List<Total3Event> Total3Events { get; set; }
 
         public DataFootball()
+        {
+            Initial();
+        }
+
+        public DataFootball(Data data)
+        {
+            Initial();
+
+            Liga = data.Liga;
+            Team1 = data.Team1;
+            Team2 = data.Team2;
+            MinuteMatch = data.MinuteMatch;
+            SumGoals = data.SumGoals;
+        }
+
+        private void Initial()
         {
             AsiatForas = new List<Fora>();
             Handicaps = new List<Handicap>();

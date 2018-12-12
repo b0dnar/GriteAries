@@ -8,13 +8,13 @@ namespace GriteAries.BK.Parse
 {
     public abstract class BaseClass
     {
-        public List<DataFootball> dataFootballs { get; set; }
-        public List<DataHockey> dataHockeys { get; set; }
+        public List<Data> dataFootballs { get; set; }
+        public List<Data> dataHockeys { get; set; }
 
         public BaseClass()
         {
-            dataFootballs = new List<DataFootball>();
-            dataHockeys = new List<DataHockey>();
+            dataFootballs = new List<Data>();
+            dataHockeys = new List<Data>();
         }
 
         #region Methods from Fora

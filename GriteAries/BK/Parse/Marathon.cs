@@ -26,12 +26,10 @@ namespace GriteAries.BK.Parse
                 string urlEvent = BaseUrlBK.GetBaseUrl(BaseUrl.MarathonLive) + item;
                 string strEvent = Base.HttpGet(urlEvent);
 
-                Data data = GetInfoEvent(strEvent);
+                Data football = GetInfoEvent(strEvent);
 
-                if (data == null)
+                if (football == null)
                     continue;
-
-                DataFootball football = new DataFootball(data);
 
                 football.Bukmeker = "Marathon";
                 football.Url = urlEvent;
@@ -56,14 +54,13 @@ namespace GriteAries.BK.Parse
                 string urlEvent = BaseUrlBK.GetBaseUrl(BaseUrl.MarathonLive) + item;
                 string strEvent = Base.HttpGet(urlEvent);
 
-                Data data = GetInfoEvent(strEvent);
+                Data hockey = GetInfoEvent(strEvent);
 
-                if (data == null)
+                if (hockey == null)
                     continue;
 
-                DataHockey hockey = new DataHockey(data);
-
                 hockey.Bukmeker = "Marathon";
+                hockey.IdEvent = item;
                 hockey.Url = urlEvent;
                 SetKoefHockey(ref hockey, strEvent);
 
@@ -155,7 +152,7 @@ namespace GriteAries.BK.Parse
             return data;
         }
 
-        private void SetKoefFootball(ref DataFootball data, string str)
+        private void SetKoefFootball(ref Data data, string str)
         {
             Regex regP1 = new Regex("Match_Result.1.\n>(?<val>.*?)<");
             Regex regP2 = new Regex(@"Match_Result.3.\n>(?<val>.*?)<");
@@ -214,7 +211,7 @@ namespace GriteAries.BK.Parse
                 data.TotalsK2.AddRange(GetTotal(str, regTotT2B, regTotT2M));
         }
 
-        private void SetKoefHockey(ref DataHockey data, string str)
+        private void SetKoefHockey(ref Data data, string str)
         {
             Regex regP1 = new Regex("Result.1.\n>(?<val>.*?)<");
             Regex regP2 = new Regex(@"Result.3.\n>(?<val>.*?)<");

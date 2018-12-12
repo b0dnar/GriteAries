@@ -183,6 +183,7 @@
     <Compile Include="BK\Parse\BaseClass.cs" />
     <Compile Include="BK\Parse\BaseUrlBK.cs" />
     <Compile Include="BK\Parse\Bukmeker.cs" />
+    <Compile Include="BK\Parse\Fonbet.cs" />
     <Compile Include="BK\Parse\Marathon.cs" />
     <Compile Include="Models\TypeBK.cs" />
     <Compile Include="Models\TypeSport.cs" />
@@ -192,8 +193,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Data.cs" />
-    <Compile Include="Models\DataFootball.cs" />
-    <Compile Include="Models\DataHockey.cs" />
     <Compile Include="Models\TypeEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request\Base.cs" />

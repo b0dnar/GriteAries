@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using GriteAries.SystemLogging;
 using GriteAries.Models;
-using Newtonsoft.Json.Schema;
+using System.Text.RegularExpressions;
 
 namespace GriteAries.BK.XBet
 {
@@ -45,12 +45,18 @@ namespace GriteAries.BK.XBet
             var jsonSport = JObject.Parse(kodSport);
             var arrEvent = (JArray)jsonSport["live"]["Value"];
 
+            var usedEvent = Container.GetUsedId(TypeBK.Xbet);
+
             foreach (var item in arrEvent)
             {
-                var data = SetDataEvent(item);
+                var data = SetDataEvent(item, usedEvent);
 
                 if (data != null)
                 {
+                    Regex regUrlEvent = new Regex($"https.*?{data.IdEvent}.*?/\",");
+                    string regValue = regUrlEvent.Match(kod).Value;
+                    data.Url = regValue.Replace("\",", "");
+
                     datas.Add(data);
                 }
             }
@@ -79,11 +85,17 @@ namespace GriteAries.BK.XBet
             return rez;
         }
 
-        private Data SetDataEvent(JToken eventToken)
+        private Data SetDataEvent(JToken eventToken, List<int> usedId)
         {
+            int id = Convert.ToInt32(eventToken["I"].ToString());
+            if(usedId.Contains(id))
+            {
+                return null;
+            }
+
             Data dataEvent = new Data();
 
-            dataEvent.IdEvent = Convert.ToInt32(eventToken["I"].ToString());
+            dataEvent.IdEvent = id;
             dataEvent.Liga = eventToken["L"].ToString();
             dataEvent.Team1 = eventToken["O1"].ToString();
             dataEvent.Team2 = eventToken["O2"].ToString();

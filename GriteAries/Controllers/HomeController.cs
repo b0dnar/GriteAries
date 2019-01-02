@@ -12,9 +12,9 @@ namespace GriteAries.Controllers
     {
         public ActionResult Index()
         {
-            Job _job = new Job();
+            //Job _job = new Job();
 
-            Task.Factory.StartNew(() => _job.RunFootball());
+            //Task.Factory.StartNew(() => _job.RunFootball());
 
 
             ViewBag.Title = "Home Page";

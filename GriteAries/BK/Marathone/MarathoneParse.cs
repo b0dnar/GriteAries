@@ -40,7 +40,9 @@ namespace GriteAries.BK.Marathone
                 return null;
             }
 
-            var idEvens = await GetIdEvent(typeSport, kod);
+            var usedIdEvent = Container.GetUsedId(TypeBK.Marathone);
+
+            var idEvens = await GetIdEvent(typeSport, kod, usedIdEvent);
             if (idEvens == null)
             {
                 return null;
@@ -59,7 +61,7 @@ namespace GriteAries.BK.Marathone
             return datas;
         }
 
-        private async Task<List<int>> GetIdEvent(TypeSport typeSport, string kodPage)
+        private async Task<List<int>> GetIdEvent(TypeSport typeSport, string kodPage, List<int> usedId)
         {
             List<int> idEvens = new List<int>();
             string kodSport;
@@ -90,7 +92,12 @@ namespace GriteAries.BK.Marathone
 
                 if (regNum.IsMatch(value))
                 {
-                    idEvens.Add(Convert.ToInt32(value));
+                    int idEv = Convert.ToInt32(value);
+
+                    if (!usedId.Contains(idEv))
+                    {
+                        idEvens.Add(idEv);
+                    }
                 }
             }
 

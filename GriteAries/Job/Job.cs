@@ -4,6 +4,7 @@ using GriteAries.BK.Marathone;
 using GriteAries.BK.XBet;
 using GriteAries.Models;
 using GriteAries.SystemEquils;
+using Quartz;
 
 namespace GriteAries
 {
@@ -19,6 +20,7 @@ namespace GriteAries
             marathone = new MarathoneParse();
             xbet = new XBetParse();
         }
+
         public async Task RunFootball()
         {
             var marathoneFootballs = await marathone.GetStartData(TypeSport.Football);
@@ -27,7 +29,7 @@ namespace GriteAries
             foreach (var matchMarafon in marathoneFootballs)
             {
                 var matchXbet = EquilsMatches(matchMarafon, xbetFootballs);
-                if(matchXbet == null)
+                if (matchXbet == null)
                 {
                     continue;
                 }

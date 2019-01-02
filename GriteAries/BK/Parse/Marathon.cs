@@ -8,65 +8,70 @@ using HtmlAgilityPack;
 
 namespace GriteAries.BK.Parse
 {
-    public class Marathon : BaseClass, Bukmeker
+    public class Marathon : Bukmeker, IBukmeker
     {
-        public void ParseLiveFootball()
+        public List<Data> ParseEvent(string[] strCutOut)
         {
+            List<Data> list = new List<Data>();
             string urlLive = BaseUrlBK.GetBaseUrl(BaseUrl.MarathonLive);
             string kodPage = Base.HttpGet(urlLive);
-            kodPage = CutOutText(kodPage, "sport\",\"label\":\"Football", "sport\",\"label\":", "</script>");
+            kodPage = CutOutText(kodPage, strCutOut[0], strCutOut[1], strCutOut[2]);
 
             if (kodPage.Equals(""))
-                return;
+                return list;
 
-            List<string> idEvent = GetIdEvent(kodPage);
+            List<int> idEvent = GetIdEvent(kodPage);
+            List<int> chooseId = Container.GetListChoiseId(TypeSport.Football);
 
             foreach (var item in idEvent)
             {
+                if (chooseId.Contains(item))
+                    continue;
+
                 string urlEvent = BaseUrlBK.GetBaseUrl(BaseUrl.MarathonLive) + item;
                 string strEvent = Base.HttpGet(urlEvent);
 
-                Data football = GetInfoEvent(strEvent);
+                Data data = GetInfoEvent(strEvent);
 
-                if (football == null)
+                if (data == null)
                     continue;
 
-                football.Bukmeker = "Marathon";
-                football.Url = urlEvent;
-                SetKoefFootball(ref football, strEvent);
+                data.Url = urlEvent;
+                data.IdEvent = item;
 
-                dataFootballs.Add(football);
+                list.Add(data);
             }
+
+            return list;
         }
 
-        public void ParseLiveHockey()
-        {
-            string urlLive = BaseUrlBK.GetBaseUrl(BaseUrl.MarathonLive);
-            string kodPage = Base.HttpGet(urlLive);
-            kodPage = CutOutText(kodPage, "sport\",\"label\":\"Ice Hockey", "sport\",\"label\":", "</script>");
+        //public void ParseLiveHockey()
+        //{
+        //    string urlLive = BaseUrlBK.GetBaseUrl(BaseUrl.MarathonLive);
+        //    string kodPage = Base.HttpGet(urlLive);
+        //    kodPage = CutOutText(kodPage, "sport\",\"label\":\"Ice Hockey", "sport\",\"label\":", "</script>");
 
-            if (kodPage.Equals(""))
-                return;
+        //    if (kodPage.Equals(""))
+        //        return;
 
-            List<string> idEvent = GetIdEvent(kodPage);
-            foreach (var item in idEvent)
-            {
-                string urlEvent = BaseUrlBK.GetBaseUrl(BaseUrl.MarathonLive) + item;
-                string strEvent = Base.HttpGet(urlEvent);
+        //    List<string> idEvent = GetIdEvent(kodPage);
+        //    foreach (var item in idEvent)
+        //    {
+        //        string urlEvent = BaseUrlBK.GetBaseUrl(BaseUrl.MarathonLive) + item;
+        //        string strEvent = Base.HttpGet(urlEvent);
 
-                Data hockey = GetInfoEvent(strEvent);
+        //        Data hockey = GetInfoEvent(strEvent);
 
-                if (hockey == null)
-                    continue;
+        //        if (hockey == null)
+        //            continue;
 
-                hockey.Bukmeker = "Marathon";
-                hockey.IdEvent = item;
-                hockey.Url = urlEvent;
-                SetKoefHockey(ref hockey, strEvent);
+        //        hockey.IdEvent = item;
+        //        hockey.Url = urlEvent;
+        //        SetKoefHockey(ref hockey, strEvent);
 
-                dataHockeys.Add(hockey);
-            }
-        }
+        //        dataHockeys.Add(hockey);
+        //    }
+        //}
 
         private string CutOutText(string str, string pattetn1, string pattern2, string pattern3)
         {
@@ -83,9 +88,9 @@ namespace GriteAries.BK.Parse
             return str.Substring(indexStart, indexEnd - indexStart);
         }
 
-        public List<string> GetIdEvent(string kod)
+        public List<int> GetIdEvent(string kod)
         {
-            List<string> lisrRez = new List<string>();
+            List<int> lisrRez = new List<int>();
             Regex reg = new Regex(@"href.:..en.live.(?<val>.*?).,");
             Regex regNum = new Regex("^[0-9]+$");
 
@@ -98,7 +103,7 @@ namespace GriteAries.BK.Parse
                     string value = item.Groups["val"].Value;
 
                     if (regNum.IsMatch(value))
-                        lisrRez.Add(value);
+                        lisrRez.Add(Convert.ToInt32(value));
                 }
             }
             catch { }

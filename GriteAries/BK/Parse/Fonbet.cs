@@ -5,7 +5,7 @@ using System.Web;
 
 namespace GriteAries.BK.Parse
 {
-    public class Fonbet : BaseClass, Bukmeker
+    public class Fonbet : Bukmeker, IBukmeker
     {
         public void ParseLiveFootball()
         {

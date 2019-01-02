@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using GriteAries.BK.Parse;
+using System.Threading.Tasks;
+using GriteAries.Models;
 
 namespace GriteAries.Controllers
 {
@@ -11,8 +12,11 @@ namespace GriteAries.Controllers
     {
         public ActionResult Index()
         {
-            Marathon marathon = new Marathon();
-            marathon.ParseLiveHockey();
+            Job _job = new Job();
+
+            Task.Factory.StartNew(() => _job.RunFootball());
+
+
             ViewBag.Title = "Home Page";
 
             return View();

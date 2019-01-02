@@ -45,15 +45,15 @@ namespace GriteAries.BK.XBet
             var jsonSport = JObject.Parse(kodSport);
             var arrEvent = (JArray)jsonSport["live"]["Value"];
 
-            await arrEvent.ParallelForEachAsync(async item =>
+            foreach (var item in arrEvent)
             {
-                var data = await SetDataEvent(item);
+                var data = SetDataEvent(item);
 
                 if (data != null)
                 {
                     datas.Add(data);
                 }
-            }, maxDegreeOfParalellism: CountParalelThread);
+            }
 
             return datas;
         }
@@ -79,18 +79,26 @@ namespace GriteAries.BK.XBet
             return rez;
         }
 
-        private async Task<Data> SetDataEvent(JToken eventToken)
+        private Data SetDataEvent(JToken eventToken)
         {
             Data dataEvent = new Data();
 
+            dataEvent.IdEvent = Convert.ToInt32(eventToken["I"].ToString());
             dataEvent.Liga = eventToken["L"].ToString();
             dataEvent.Team1 = eventToken["O1"].ToString();
-            dataEvent.Team1 = eventToken["O2"].ToString();
+            dataEvent.Team2 = eventToken["O2"].ToString();
 
             var goals = eventToken["SC"]["FS"];
-            var el = goals[0].Children<JProperty>().FirstOrDefault(x => x.Name == "S1");
+            if(goals.Count() != 0)
+            {
+                dataEvent.SumGoals = Convert.ToInt32(goals["S1"]?.ToString() ?? "0");
+                dataEvent.SumGoals += Convert.ToInt32(goals["S2"]?.ToString() ?? "0");
+            }
 
-            return null;
+            int milisec = Convert.ToInt32(eventToken["SC"]["TS"]?.ToString() ?? "0");
+            dataEvent.MinuteMatch = milisec / 60;
+
+            return dataEvent;
         }
     }
 }

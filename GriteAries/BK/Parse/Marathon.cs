@@ -21,7 +21,7 @@ namespace GriteAries.BK.Parse
                 return list;
 
             List<int> idEvent = GetIdEvent(kodPage);
-            List<int> chooseId = Container.GetListChoiseId(TypeSport.Football);
+            List<int> chooseId = new List<int>();// Container.GetListChoiseId(TypeSport.Football);
 
             foreach (var item in idEvent)
             {

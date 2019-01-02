@@ -206,6 +206,7 @@
     <Compile Include="Models\TypeEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request\Base.cs" />
+    <Compile Include="SystemEquils\SimilarityTool.cs" />
     <Compile Include="SystemLogging\Logging.cs" />
   </ItemGroup>
   <ItemGroup>

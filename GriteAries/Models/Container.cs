@@ -2,57 +2,119 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using GriteAries.Models;
 
 namespace GriteAries.Models
 {
     public static class Container
     {
-        public static List<Data> dataAllFootballs { get; set; }
-        public static List<Data> dataChoosenFootballs { get; set; }
+        public static List<int> marathoneUsedIdEvents { get; set; }
+        public static List<int> xbetUsedIdEvents{ get; set; }
+
 
         static Container()
         {
-            dataAllFootballs = new List<Data>();
-            dataChoosenFootballs = new List<Data>();
+            marathoneUsedIdEvents = new List<int>();
+            xbetUsedIdEvents = new List<int>();
         }
 
-        public static void SetFootball(ref List<Data> data)
+        public static void SetUsedId(TypeBK bk, int idEvent)
         {
-            dataAllFootballs.Clear();
-            dataAllFootballs.AddRange(data);
-        }
-
-        public static List<int> GetListChoiseId(TypeSport type)
-        {
-            switch (type)
+            switch(bk)
             {
-                case TypeSport.Football:
-                    return dataChoosenFootballs.Select(x => x.IdEvent).ToList();
+                case TypeBK.Marathone:
+                    marathoneUsedIdEvents.Add(idEvent);
+                    break;
+                case TypeBK.Xbet:
+                    xbetUsedIdEvents.Add(idEvent);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public static List<int> GetUsedId(TypeBK bk)
+        {
+            switch(bk)
+            {
+                case TypeBK.Marathone:
+                    return marathoneUsedIdEvents;
+                case TypeBK.Xbet:
+                    return xbetUsedIdEvents;
                 default:
                     return null;
             }
-
         }
 
-        public static Data GetDataById(TypeSport type, int id)
+        //public static void SetFootball(ref List<Data> data)
+        //{
+        //    dataAllFootballs.Clear();
+        //    dataAllFootballs.AddRange(data);
+        //}
+
+        //public static List<int> GetListChoiseId(TypeSport type)
+        //{
+        //    switch (type)
+        //    {
+        //        case TypeSport.Football:
+        //            return dataChoosenFootballs.Select(x => x.IdEvent).ToList();
+        //        default:
+        //            return null;
+        //    }
+
+        //}
+
+        //public static Data GetDataById(TypeSport type, int id)
+        //{
+        //    switch(type)
+        //    {
+        //        case TypeSport.Football:
+        //            return  dataAllFootballs.FirstOrDefault(x => x.IdEvent == id);
+        //        default:
+        //            return null;
+        //    }
+        //}
+        //public static List<Data> GetListData(TypeSport type)
+        //{
+        //    switch (type)
+        //    {
+        //        case TypeSport.Football:
+        //            return dataAllFootballs;
+        //        default:
+        //            return null;
+        //    }
+        //}
+    }
+
+    public class UsedData
+    {
+        public List<Data> footballUsedData;
+
+        public UsedData()
         {
-            switch(type)
+            footballUsedData = new List<Data>();
+        }
+
+        public void SetData(TypeSport sport, Data data)
+        {
+            switch(sport)
             {
                 case TypeSport.Football:
-                    return  dataAllFootballs.FirstOrDefault(x => x.IdEvent == id);
-                default:
-                    return null;
+                    footballUsedData.Add(data);
+                    break;
             }
         }
-        public static List<Data> GetListData(TypeSport type)
+
+        public List<Data> GetData(TypeSport sport)
         {
-            switch (type)
+            switch(sport)
             {
                 case TypeSport.Football:
-                    return dataAllFootballs;
+                    return footballUsedData;
                 default:
                     return null;
             }
         }
     }
+
 }

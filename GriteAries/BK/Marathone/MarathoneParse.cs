@@ -128,6 +128,7 @@ namespace GriteAries.BK.Marathone
             string[] arrGoalsTime;
             try
             {
+                dataEvent.IdEvent = idEvent;
                 dataEvent.Url = $"https://www.marathonbet.com/en/live/{idEvent}";
                 var nameMatch = regNameTeams.Match(html.Text).Groups["val"].Value;
                 var nameTeams = Regex.Split(nameMatch, " vs ");

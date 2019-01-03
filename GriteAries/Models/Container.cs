@@ -8,12 +8,14 @@ namespace GriteAries.Models
 {
     public static class Container
     {
+        public static List<UsedData> listUsedFootball;
         public static List<int> marathoneUsedIdEvents { get; set; }
         public static List<int> xbetUsedIdEvents{ get; set; }
 
 
         static Container()
         {
+            listUsedFootball = new List<UsedData>();
             marathoneUsedIdEvents = new List<int>();
             xbetUsedIdEvents = new List<int>();
         }
@@ -46,44 +48,27 @@ namespace GriteAries.Models
             }
         }
 
-        //public static void SetFootball(ref List<Data> data)
-        //{
-        //    dataAllFootballs.Clear();
-        //    dataAllFootballs.AddRange(data);
-        //}
+        public static void SetUsedDatas(TypeSport sport, UsedData data)
+        {
+            switch (sport)
+            {
+                case TypeSport.Football:
+                    listUsedFootball.Add(data);
+                    break;
 
-        //public static List<int> GetListChoiseId(TypeSport type)
-        //{
-        //    switch (type)
-        //    {
-        //        case TypeSport.Football:
-        //            return dataChoosenFootballs.Select(x => x.IdEvent).ToList();
-        //        default:
-        //            return null;
-        //    }
+            }
+        }
 
-        //}
-
-        //public static Data GetDataById(TypeSport type, int id)
-        //{
-        //    switch(type)
-        //    {
-        //        case TypeSport.Football:
-        //            return  dataAllFootballs.FirstOrDefault(x => x.IdEvent == id);
-        //        default:
-        //            return null;
-        //    }
-        //}
-        //public static List<Data> GetListData(TypeSport type)
-        //{
-        //    switch (type)
-        //    {
-        //        case TypeSport.Football:
-        //            return dataAllFootballs;
-        //        default:
-        //            return null;
-        //    }
-        //}
+        public static List<UsedData> GetUsedDatas(TypeSport sport)
+        {
+            switch (sport)
+            {
+                case TypeSport.Football:
+                    return listUsedFootball;
+                default:
+                    return null;
+            }
+        }
     }
 
     public class UsedData

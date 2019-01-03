@@ -14,6 +14,7 @@ namespace GriteAries.Models
         public string Url { get; set; }
         public int MinuteMatch { get; set; }
         public int SumGoals { get; set; }
+        public TypeBK Bukmeker { get; set; }
         public ValueBK P1 { get; set; }
         public ValueBK P2 { get; set; }
         public ValueBK X { get; set; }

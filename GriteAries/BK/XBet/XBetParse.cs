@@ -95,6 +95,7 @@ namespace GriteAries.BK.XBet
 
             Data dataEvent = new Data();
 
+            dataEvent.Bukmeker = TypeBK.Xbet;
             dataEvent.IdEvent = id;
             dataEvent.Liga = eventToken["L"].ToString();
             dataEvent.Team1 = eventToken["O1"].ToString();

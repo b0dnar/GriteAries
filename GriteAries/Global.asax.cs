@@ -22,6 +22,7 @@ namespace GriteAries
 
             //schedulars
             ScheduleStartData.Start();
+            SchedulerSetKoef.Start();
         }
     }
 }

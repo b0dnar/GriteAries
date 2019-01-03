@@ -190,11 +190,7 @@
     <Compile Include="BK\IBukmekerParse.cs" />
     <Compile Include="BK\Marathone\MarathoneParse.cs" />
     <Compile Include="BK\Marathone\MarathoneWeb.cs" />
-    <Compile Include="BK\Parse\Bukmeker.cs" />
-    <Compile Include="BK\Parse\BaseUrlBK.cs" />
-    <Compile Include="BK\Parse\IBukmeker.cs" />
-    <Compile Include="BK\Parse\Fonbet.cs" />
-    <Compile Include="BK\Parse\Marathon.cs" />
+    <Compile Include="BK\Bukmeker.cs" />
     <Compile Include="BK\XBet\XBetParse.cs" />
     <Compile Include="BK\XBet\XBetWeb.cs" />
     <Compile Include="Job\Job.cs" />
@@ -210,6 +206,7 @@
     <Compile Include="Models\TypeEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request\Base.cs" />
+    <Compile Include="Schedulers\SchedulerSetKoef.cs" />
     <Compile Include="Schedulers\ScheduleStartData.cs" />
     <Compile Include="SystemEquils\SimilarityTool.cs" />
     <Compile Include="SystemLogging\Logging.cs" />

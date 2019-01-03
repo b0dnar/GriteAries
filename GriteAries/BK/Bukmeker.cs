@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using GriteAries.Models;
 
-namespace GriteAries.BK.Parse
+namespace GriteAries.BK
 {
     public abstract class Bukmeker
     {
@@ -161,9 +161,14 @@ namespace GriteAries.BK.Parse
             valueBK.BK = TypeBK.Marathone;
 
             if (!str.Equals(""))
+            {
                 valueBK.Value = ConvertToFloat(str);
+            }
             else
+            {
                 valueBK.Value = 0;
+            }
+                
 
             return valueBK;
         }
@@ -171,9 +176,11 @@ namespace GriteAries.BK.Parse
         public float ConvertToFloat(string str)
         {
             if (str.Equals(""))
+            {
                 return 0;
+            }
 
-            return ConvertToFloat(str);
+            return Convert.ToSingle(str);
         }
         #endregion
     }

@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Async;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using GriteAries.BK.Marathone;
 using GriteAries.BK.XBet;
 using GriteAries.Models;
+using GriteAries.Schedulers;
 using GriteAries.SystemEquils;
 using Quartz;
 
@@ -10,13 +12,11 @@ namespace GriteAries
 {
     public class Job
     {
-        private List<UsedData> listUsedData;
         private MarathoneParse marathone;
         private XBetParse xbet;
 
         public Job()
         {
-            listUsedData = new List<UsedData>();
             marathone = new MarathoneParse();
             xbet = new XBetParse();
         }
@@ -25,6 +25,8 @@ namespace GriteAries
         {
             var marathoneFootballs = await marathone.GetStartData(TypeSport.Football);
             var xbetFootballs = await xbet.GetStartData(TypeSport.Football);
+
+            var listUsedData = Container.GetUsedDatas(TypeSport.Football);
 
             foreach (var matchMarafon in marathoneFootballs)
             {
@@ -72,6 +74,22 @@ namespace GriteAries
             }
 
             return null;
+        }
+
+        public async Task SetKoef(UsedData usedData)
+        {
+            int maxThread = 1;
+            await usedData.footballUsedData.ParallelForEachAsync(async x =>
+            {
+                if (x.Bukmeker == TypeBK.Marathone)
+                {
+                     await marathone.SetKoeficient(x);
+                }
+                else if (x.Bukmeker == TypeBK.Xbet)
+                {
+                    
+                }
+            }, maxThread);
         }
     }
 }

@@ -9,7 +9,7 @@ using System.Collections.Async;
 
 namespace GriteAries.BK.Marathone
 {
-    public class MarathoneParse : IBukmekerParse
+    public class MarathoneParse : Bukmeker, IBukmekerParse
     {
         private MarathoneWeb _web;
         private Logging _logging;
@@ -20,6 +20,21 @@ namespace GriteAries.BK.Marathone
         Regex regNameTeams = new Regex("data-event-name=.(?<val>.*?). data-live");
         Regex regGoals = new Regex(@" (?<val1>\d*?):(?<val2>\d*?) ");
         Regex regTime = new Regex(@" (?<val>\d*?):");
+
+        Regex regP1 = new Regex("Match_Result.1.\n>(?<val>.*?)<");
+        Regex regP2 = new Regex(@"Match_Result.3.\n>(?<val>.*?)<");
+        Regex regX = new Regex(@"Match_Result.draw.\n>(?<val>.*?)<");
+        Regex regP1X = new Regex("Result.HD.\n>(?<val>.*?)<");
+        Regex regP12 = new Regex(@"Result.HA.\n>(?<val>.*?)<");
+        Regex regP2X = new Regex(@"Result.AD.\n>(?<val>.*?)<"); 
+        Regex regTotB = new Regex(@"Over (?<val1>.*?).,.mn.:.Total Goals.,.*?epr.:.(?<val2>.*?).,");
+        Regex regTotM = new Regex(@"Under (?<val1>.*?).,.mn.:.Total Goals.,.*?epr.:.(?<val2>.*?).,");
+        Regex regTot3B = new Regex(@"Over (?<val1>.*?).,.mn.:.Total Goals .3 way..,.*?epr.:.(?<val2>.*?).,");
+        Regex regTot3M = new Regex(@"Under (?<val1>.*?).,.mn.:.Total Goals .3 way..,.*?epr.:.(?<val2>.*?).,");
+        Regex regTot3E = new Regex(@"Exactly (?<val1>.*?).,.mn.:.Total Goals .3 way..,.*?epr.:.(?<val2>.*?).,");
+        Regex regTotAsB = new Regex(@"Over (?<val1>.*?).,.mn.:.Asian Total Goals.,.*?epr.:.(?<val2>.*?).,");
+        Regex regTotAsM = new Regex(@"Under (?<val1>.*?).,.mn.:.Asian Total Goals.,.*?epr.:.(?<val2>.*?).,");
+      
 
         public MarathoneParse()
         {
@@ -125,7 +140,6 @@ namespace GriteAries.BK.Marathone
             return str.Substring(indexStart, indexEnd - indexStart);
         }
 
-
         private async Task<Data> SetDataEvent(int idEvent)
         {
             Data dataEvent = new Data();
@@ -135,6 +149,7 @@ namespace GriteAries.BK.Marathone
             string[] arrGoalsTime;
             try
             {
+                dataEvent.Bukmeker = TypeBK.Marathone;
                 dataEvent.IdEvent = idEvent;
                 dataEvent.Url = $"https://www.marathonbet.com/en/live/{idEvent}";
                 var nameMatch = regNameTeams.Match(html.Text).Groups["val"].Value;
@@ -178,6 +193,82 @@ namespace GriteAries.BK.Marathone
             }
 
             return dataEvent;
+        }
+
+
+        public async Task<Data> SetKoeficient(Data data)
+        {
+            Regex regFora1 = new Regex($"{data.Team1}..(?<val1>.*?)..,.mn.:.To Win Match With Handicap.,.*?epr.:.(?<val2>.*?).,");
+            Regex regFora2 = new Regex($"{data.Team2}..(?<val1>.*?)..,.mn.:.To Win Match With Handicap.,.*?epr.:.(?<val2>.*?).,");
+            Regex regHand1 = new Regex($"{data.Team1}..(?<val1>.*?)..,.mn.:.To Win Match With Handicap .3 way..,.*?epr.:.(?<val2>.*?).,");
+            Regex regHand2 = new Regex($"{data.Team2}..(?<val1>.*?)..,.mn.:.To Win Match With Handicap .3 way..,.*?epr.:.(?<val2>.*?).,");
+            Regex regHandD = new Regex(@"Draw..(?<val1>.*?)..,.mn.:.To Win Match With Handicap .3 way..,.*?epr.:.(?<val2>.*?).,");
+            Regex regForaAs1 = new Regex($"{data.Team1}..(?<val1>.*?)..,.mn.:.To Win Match With Asian Handicap.,.*?epr.:.(?<val2>.*?).,");
+            Regex regForaAs2 = new Regex($"{data.Team2}..(?<val1>.*?)..,.mn.:.To Win Match With Asian Handicap.,.*?epr.:.(?<val2>.*?).,");
+            Regex regTotT1B = new Regex($"Over (?<val1>.*?).,.mn.:.Total Goals .{data.Team1}..,.*?epr.:.(?<val2>.*?).,");
+            Regex regTotT1M = new Regex($"Under (?<val1>.*?).,.mn.:.Total Goals .{data.Team1}..,.*?epr.:.(?<val2>.*?).,");
+            Regex regTotT2B = new Regex($"Over (?<val1>.*?).,.mn.:.Total Goals .{data.Team2}..,.*?epr.:.(?<val2>.*?).,");
+            Regex regTotT2M = new Regex($"Under (?<val1>.*?).,.mn.:.Total Goals .{data.Team2}..,.*?epr.:.(?<val2>.*?).,");
+
+            try
+            {
+                var kod = await _web.GetPageEvent(data.IdEvent);
+                var str = kod.Text;
+
+                data.P1 = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regP1.Match(str).Groups["val"].Value) };
+                data.P2 = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regP2.Match(str).Groups["val"].Value) };
+                data.X = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regX.Match(str).Groups["val"].Value) };
+                data.X1 = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regP1X.Match(str).Groups["val"].Value) };
+                data.P12 = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regP12.Match(str).Groups["val"].Value) };
+                data.X2 = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regP2X.Match(str).Groups["val"].Value) };
+
+                if (str.Contains("\"To Win Match With Handicap\""))
+                {
+                    data.Foras.AddRange(GetFora(str, regFora1, regFora2));
+                }
+
+                if (str.Contains("\"To Win Match With Handicap (3 way)\""))
+                {
+                    data.Handicaps.AddRange(GetHandicap(str, regHand1, regHand2, regHandD));
+                }
+
+                if (str.Contains("\"To Win Match With Asian Handicap\""))
+                {
+                    data.AsiatForas.AddRange(GetFora(str, regForaAs1, regForaAs2));
+                }
+
+                if (str.Contains("\"Total Goals\""))
+                {
+                    data.Totals.AddRange(GetTotal(str, regTotB, regTotM));
+                }
+
+                if (str.Contains("\"Total Goals (3 way)\""))
+                {
+                    data.Total3Events.AddRange(GetTot3Event(str, regTot3B, regTot3M, regTot3E));
+                }
+
+                if (str.Contains("\"Asian Total Goals\""))
+                {
+                    data.AsiatTotals.AddRange(GetTotal(str, regTotAsB, regTotAsM));
+                }
+
+                if (str.Contains("\"Total Goals (" + data.Team1 + ")\""))
+                {
+                    data.TotalsK1.AddRange(GetTotal(str, regTotT1B, regTotT1M));
+                }
+
+                if (str.Contains("\"Total Goals (" + data.Team2 + ")\""))
+                {
+                    data.TotalsK2.AddRange(GetTotal(str, regTotT2B, regTotT2M));
+                }
+            }
+            catch (Exception e)
+            {
+                string log = $"Error in parse koef\n{e.ToString()}";
+                await _logging.WriteLog(log);
+            }
+            
+            return data;
         }
     }
 

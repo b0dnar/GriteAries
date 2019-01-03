@@ -30,7 +30,7 @@ namespace GriteAries.BK.XBet
         {
             var datas = new List<Data>();
 
-            var kod= await _web.GetPageLiveEvent(typeSport.ToString());
+            var kod= await _web.GetPageLiveSport(typeSport.ToString());
             if (kod == null)
             {
                 return null;
@@ -112,6 +112,14 @@ namespace GriteAries.BK.XBet
             dataEvent.MinuteMatch = milisec / 60;
 
             return dataEvent;
+        }
+
+
+        public async Task SetKoeficient(Data data)
+        {
+            data.ClearOld();
+
+            var kod = await _web.GetInfoEvent(data.Url);
         }
     }
 }

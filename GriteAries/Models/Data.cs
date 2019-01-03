@@ -41,6 +41,24 @@ namespace GriteAries.Models
             AsiatForas = new List<Fora>();
             Handicaps = new List<Handicap>();
         }
+
+        public void ClearOld()
+        {
+            P1 = new ValueBK();
+            P2 = new ValueBK();
+            X = new ValueBK();
+            P12 = new ValueBK();
+            X2 = new ValueBK();
+            X1 = new ValueBK();
+            Totals.Clear();
+            AsiatTotals.Clear();
+            TotalsK1.Clear();
+            TotalsK2.Clear();
+            Total3Events.Clear();
+            Foras.Clear();
+            AsiatForas.Clear();
+            Handicaps.Clear();
+        }
     }
 }
 

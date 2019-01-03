@@ -196,8 +196,10 @@ namespace GriteAries.BK.Marathone
         }
 
 
-        public async Task<Data> SetKoeficient(Data data)
+        public async Task SetKoeficient(Data data)
         {
+            data.ClearOld();
+
             Regex regFora1 = new Regex($"{data.Team1}..(?<val1>.*?)..,.mn.:.To Win Match With Handicap.,.*?epr.:.(?<val2>.*?).,");
             Regex regFora2 = new Regex($"{data.Team2}..(?<val1>.*?)..,.mn.:.To Win Match With Handicap.,.*?epr.:.(?<val2>.*?).,");
             Regex regHand1 = new Regex($"{data.Team1}..(?<val1>.*?)..,.mn.:.To Win Match With Handicap .3 way..,.*?epr.:.(?<val2>.*?).,");
@@ -267,8 +269,6 @@ namespace GriteAries.BK.Marathone
                 string log = $"Error in parse koef\n{e.ToString()}";
                 await _logging.WriteLog(log);
             }
-            
-            return data;
         }
     }
 

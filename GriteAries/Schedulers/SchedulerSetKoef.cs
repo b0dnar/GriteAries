@@ -33,7 +33,7 @@ namespace GriteAries.Schedulers
         Job _job = new Job();
         public async Task Execute(IJobExecutionContext context)
         {
-            int maxThread = 1;
+            int maxThread = 10;
             var allFootball = Container.GetUsedDatas(TypeSport.Football);
 
             await allFootball.ParallelForEachAsync(async x =>

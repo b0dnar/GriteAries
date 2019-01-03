@@ -78,16 +78,21 @@ namespace GriteAries
 
         public async Task SetKoef(UsedData usedData)
         {
-            int maxThread = 1;
+            int maxThread = 10;
             await usedData.footballUsedData.ParallelForEachAsync(async x =>
             {
-                if (x.Bukmeker == TypeBK.Marathone)
+                switch (x.Bukmeker)
                 {
-                     await marathone.SetKoeficient(x);
-                }
-                else if (x.Bukmeker == TypeBK.Xbet)
-                {
-                    
+                    case TypeBK.Marathone:
+                        await marathone.SetKoeficient(x);
+                        break;
+                    case TypeBK.Fonbet:
+                        break;
+                    case TypeBK.Xbet:
+                        await xbet.SetKoeficient(x);
+                        break;
+                    default:
+                        break;
                 }
             }, maxThread);
         }

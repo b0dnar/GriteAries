@@ -26,9 +26,41 @@ namespace GriteAries.BK.XBet
             AcceptLanguage = "uk-UA,uk;q=0.9,ru;q=0.8,en-US;q=0.7,en;q=0.6";
         }
 
-        public async Task<string> GetPageLiveEvent(string nameSport)
+        public async Task<string> GetPageLiveSport(string nameSport)
         {
-            var request = (HttpWebRequest)WebRequest.Create($"https://1xbetua.com/en/live/{nameSport}/");//Football
+            var request = (HttpWebRequest)WebRequest.Create($"https://1xbetua.com/en/live/{nameSport}/");
+
+            request.Method = "GET";
+            request.UserAgent = UserAgent;
+            request.Accept = Accept;
+            request.Referer = "https://1xbetua.com/en/";
+            request.Headers.Add("Upgrade-Insecure-Requests", "1");
+            request.Headers.Add("Accept-Encoding", AcceptEncoding);
+            request.Headers.Add("Accept-Language", AcceptLanguage);
+            request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+
+            try
+            {
+                var response = await request.GetResponseAsync();
+
+                var stream = response.GetResponseStream();
+                StreamReader responseReader = new StreamReader(stream, Encoding.UTF8);
+                var kodPage = await responseReader.ReadToEndAsync();
+
+                return kodPage;
+            }
+            catch (Exception e)
+            {
+                string log = String.Format("ERROR in GetPageEvent\n{0}", e.ToString());
+                await _logging.WriteLog(log);
+
+                return null;
+            }
+        }
+
+        public async Task<string> GetInfoEvent(string url)
+        {
+            var request = (HttpWebRequest)WebRequest.Create(url);
 
             request.Method = "GET";
             request.UserAgent = UserAgent;

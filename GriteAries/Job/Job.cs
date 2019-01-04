@@ -6,7 +6,7 @@ using GriteAries.BK.XBet;
 using GriteAries.Models;
 using GriteAries.Schedulers;
 using GriteAries.SystemEquils;
-using Quartz;
+using System.Linq;
 
 namespace GriteAries
 {
@@ -52,6 +52,7 @@ namespace GriteAries
             int borderTime = 3;
             double borderKoefLiga = 0.4, borderTeam = 0.7;
             SimilarityTool sEquils = new SimilarityTool();
+            Dictionary<Data, double> listData = new Dictionary<Data, double>();
 
             foreach (var item in arrMatches)
             {
@@ -70,10 +71,23 @@ namespace GriteAries
                 if (kTeam1 + kTeam2 < borderTeam)
                     continue;
 
-                return item;
+                var val = kLiga + kTeam1 + kTeam2;
+                listData.Add(item, val);
             }
 
-            return null;
+            if(listData.Count == 0)
+            {
+                return null;
+            }
+            else if(listData.Count == 1)
+            {
+                return listData.Keys.ToList()[0];
+            }
+            else
+            {
+                var maxVal = listData.Values.ToList().Max();
+                return listData.FirstOrDefault(x => x.Value == maxVal).Key;
+            }
         }
 
         public async Task SetKoef(UsedData usedData)

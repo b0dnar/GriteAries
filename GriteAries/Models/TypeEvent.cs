@@ -35,9 +35,25 @@ namespace GriteAries.Models
         public ValueBK Team2 { get; set; }
     }
 
-    public struct ValueBK
+    public class ValueBK
     {
         public float Value;
         public TypeBK BK;
+
+        public ValueBK()
+        {
+
+        }
+
+        public ValueBK(TypeBK bk)
+        {
+            BK = bk;
+        }
+
+        public ValueBK(TypeBK bk, float val)
+        {
+            BK = bk;
+            Value = val;
+        }
     }
 }

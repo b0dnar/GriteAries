@@ -36,6 +36,11 @@ namespace GriteAries.Schedulers
             int maxThread = 10;
             var allFootball = Container.GetUsedDatas(TypeSport.Football);
 
+            if(allFootball.Count == 0)
+            {
+                return;
+            }
+
             await allFootball.ParallelForEachAsync(async x =>
             {
                await _job.SetKoef(x);

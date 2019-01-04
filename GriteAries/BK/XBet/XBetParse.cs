@@ -119,7 +119,21 @@ namespace GriteAries.BK.XBet
         {
             data.ClearOld();
 
-            var kod = await _web.GetInfoEvent(data.Url);
+            var kod = await _web.GetInfoEvent(data.IdEvent);
+            var json = JObject.Parse(kod);
+
+            var arrEvents = (JArray)json["Value"]["GE"];
+
+            foreach (var ev in arrEvents)
+            {
+                var arrData = (JArray) ev["E"];
+
+                foreach (var jsonData in arrData)
+                {
+                    
+                    //var type =  jsonData["T"];
+                }
+            }
         }
     }
 }

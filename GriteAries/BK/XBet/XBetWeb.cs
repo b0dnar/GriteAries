@@ -58,9 +58,9 @@ namespace GriteAries.BK.XBet
             }
         }
 
-        public async Task<string> GetInfoEvent(string url)
+        public async Task<string> GetInfoEvent(int idEvent)
         {
-            var request = (HttpWebRequest)WebRequest.Create(url);
+            var request = (HttpWebRequest)WebRequest.Create($"https://1xbetua.com/LiveFeed/GetGameZip?id={idEvent}&lng=en&cfview=0&isSubGames=true&GroupEvents=true&countevents=250");
 
             request.Method = "GET";
             request.UserAgent = UserAgent;

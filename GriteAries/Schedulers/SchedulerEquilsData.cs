@@ -1,26 +1,25 @@
-﻿using System.Collections.Async;
+﻿using System;
 using System.Threading.Tasks;
-using GriteAries.BK.XBet;
 using Quartz;
 using Quartz.Impl;
-using GriteAries.Models;
 
 namespace GriteAries.Schedulers
 {
-    public class SchedulerSetKoef
+    public class SchedulerEquilsData
     {
         public static async void Start()
         {
+            DateTime date = DateTime.Now.AddMinutes(3); 
             IScheduler scheduler = await StdSchedulerFactory.GetDefaultScheduler();
             await scheduler.Start();
 
-            IJobDetail job = JobBuilder.Create<RunSetKoef>().Build();
+            IJobDetail job = JobBuilder.Create<RunEquilsData>().Build();
 
             ITrigger trigger = TriggerBuilder.Create()  // создаем триггер
-                .WithIdentity("setKoefRun", "group2")     // идентифицируем триггер с именем и группой
-                .StartNow()                            // запуск сразу после начала выполнения
+                .WithIdentity("equilsRun", "group3")     // идентифицируем триггер с именем и группой
+                .StartAt(date)                           // запуск сразу после начала выполнения
                 .WithSimpleSchedule(x => x            // настраиваем выполнение действия
-                    .WithIntervalInSeconds(7)          // через 1 минуту
+                    .WithIntervalInSeconds(5)          // через 1 минуту
                     .RepeatForever())                   // бесконечное повторение
                 .Build();                               // создаем триггер
 
@@ -28,28 +27,12 @@ namespace GriteAries.Schedulers
         }
     }
 
-    public class RunSetKoef : IJob
+    public class RunEquilsData : IJob
     {
         Job _job = new Job();
         public async Task Execute(IJobExecutionContext context)
         {
-            const int maxThread = 10;
-            var allFootball = Container.GetUsedDatas(TypeSport.Football);
-
-            if(allFootball.Count == 0)
-            {
-                return;
-            }
-
-            await allFootball.ParallelForEachAsync(async x =>
-            {
-               await _job.SetKoef(x);
-            }, maxThread);
+            await _job.EquilsData();
         }
     }
 }
-
-
-
-
-    

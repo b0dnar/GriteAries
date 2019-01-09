@@ -90,6 +90,7 @@ namespace GriteAries
             }
         }
 
+
         public async Task SetKoef(UsedData usedData)
         {
             int maxThread = 10;
@@ -109,6 +110,82 @@ namespace GriteAries
                         break;
                 }
             }, maxThread);
+        }
+
+        public async Task EquilsData()
+        {
+            var allFootball = Container.GetUsedDatas(TypeSport.Football);
+
+            foreach (var item in allFootball)
+            {
+                GetMaxData(item.footballUsedData);
+            }
+        }
+
+        private Data GetMaxData(List<Data> datas)
+        {
+            Data data = new Data();
+
+            data.Liga = datas[0].Liga;
+            data.Team1 = datas[0].Team1;
+            data.Team2 = datas[0].Team2;
+
+            data.P1 = GetMaxValue(datas.Select(i => i.P1).ToList());
+            data.X = GetMaxValue(datas.Select(i => i.X).ToList());
+            data.P2 = GetMaxValue(datas.Select(i => i.P2).ToList());
+            data.X1 = GetMaxValue(datas.Select(i => i.X1).ToList());
+            data.P12 = GetMaxValue(datas.Select(i => i.P12).ToList());
+            data.X2 = GetMaxValue(datas.Select(i => i.X2).ToList());
+
+            data.Totals = GetMaxTotals(datas.Select(i => i.Totals).ToList());
+
+            return data;
+        }
+
+        private List<Total> GetMaxTotals(List<List<Total>> allTotals)
+        {
+            List<Total> totals = new List<Total>();
+            HashSet<string> allName = new HashSet<string>();
+
+            foreach (var item in allTotals)
+            {
+                var listName = item.Select(x => x.Name);
+                foreach (var name in listName)
+                {
+                    allName.Add(name);
+                }
+            }
+
+            foreach (var item in allName)//?
+            {
+                var listTot = allTotals.Where(list => list.Any(s => s.Name == item)).SelectMany(d => d).ToList();
+                Total total = new Total();
+
+                total.Name = item;
+                total.Over = GetMaxValue(listTot.Select(x => x.Over).ToList());
+                total.Under = GetMaxValue(listTot.Select(x => x.Under).ToList());
+
+                totals.Add(total);
+            }
+
+            
+
+            return totals;
+        }
+
+        private ValueBK GetMaxValue(List<ValueBK> values)
+        {
+            ValueBK maxValue = values[0];
+
+            for (int i = 1; i < values.Count; i++)
+            {
+                if (maxValue.Value < values[i].Value)
+                {
+                    maxValue = values[i];
+                }
+            }
+
+            return maxValue;
         }
     }
 }

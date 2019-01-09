@@ -206,6 +206,7 @@
     <Compile Include="Models\TypeEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request\Base.cs" />
+    <Compile Include="Schedulers\SchedulerEquilsData.cs" />
     <Compile Include="Schedulers\SchedulerSetKoef.cs" />
     <Compile Include="Schedulers\ScheduleStartData.cs" />
     <Compile Include="SystemEquils\SimilarityTool.cs" />

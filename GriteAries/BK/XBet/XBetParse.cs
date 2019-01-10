@@ -96,7 +96,7 @@ namespace GriteAries.BK.XBet
             dataEvent.Liga = eventToken["L"].ToString();
             dataEvent.Team1 = eventToken["O1"].ToString();
             dataEvent.Team2 = eventToken["O2"].ToString();
-            dataEvent.Url = $"https://1xbetua.com/live/Football/{eventToken["LI"].ToString()}-{dataEvent.Liga.Replace(" ", "-")}/{dataEvent.IdEvent}-{dataEvent.Team1.Replace(" ", "-")}-{dataEvent.Team2.Replace(" ", "-")}/";
+            dataEvent.Url = $"https://1xbetua.com/live/Football/{eventToken["LI"].ToString()}-{dataEvent.Liga.Replace(" ", "-").Replace(".","")}/{dataEvent.IdEvent}-{dataEvent.Team1.Replace(" ", "-")}-{dataEvent.Team2.Replace(" ", "-")}/";
 
             var goals = eventToken["SC"]["FS"];
             if (goals.Count() != 0)
@@ -115,13 +115,13 @@ namespace GriteAries.BK.XBet
         public async Task SetKoeficient(Data data)
         {
             const int indexPX = 1, index2PX = 8, indexTot = 17, indexFora = 2, indexTotT1 = 15, indexTotT2 = 62, indexAsTot = 99, indexAsFora = 2854, index3EvTot = 87, index3EvFora = 27;
-            data.ClearOld();
 
             try
             {
                 var kod = await _web.GetInfoEvent(data.IdEvent);
                 var json = JObject.Parse(kod);
                 var arrEvents = (JArray)json["Value"]["GE"];
+                data.ClearOld();
 
                 foreach (var even in arrEvents)
                 {

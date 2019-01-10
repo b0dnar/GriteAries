@@ -1,6 +1,6 @@
 ﻿using System.Collections.Async;
 using System.Threading.Tasks;
-using GriteAries.BK.XBet;
+using System;
 using Quartz;
 using Quartz.Impl;
 using GriteAries.Models;
@@ -11,6 +11,7 @@ namespace GriteAries.Schedulers
     {
         public static async void Start()
         {
+            DateTime date = DateTime.Now.AddSeconds(30);
             IScheduler scheduler = await StdSchedulerFactory.GetDefaultScheduler();
             await scheduler.Start();
 
@@ -18,7 +19,7 @@ namespace GriteAries.Schedulers
 
             ITrigger trigger = TriggerBuilder.Create()  // создаем триггер
                 .WithIdentity("setKoefRun", "group2")     // идентифицируем триггер с именем и группой
-                .StartNow()                            // запуск сразу после начала выполнения
+                .StartAt(date)                            // запуск сразу после начала выполнения
                 .WithSimpleSchedule(x => x            // настраиваем выполнение действия
                     .WithIntervalInSeconds(7)          // через 1 минуту
                     .RepeatForever())                   // бесконечное повторение

@@ -199,8 +199,6 @@ namespace GriteAries.BK.Marathone
 
         public async Task SetKoeficient(Data data)
         {
-            data.ClearOld();
-
             Regex regFora1 = new Regex($"{data.Team1}..(?<val1>.*?)..,.mn.:.To Win Match With Handicap.,.*?epr.:.(?<val2>.*?).,");
             Regex regFora2 = new Regex($"{data.Team2}..(?<val1>.*?)..,.mn.:.To Win Match With Handicap.,.*?epr.:.(?<val2>.*?).,");
             Regex regHand1 = new Regex($"{data.Team1}..(?<val1>.*?)..,.mn.:.To Win Match With Handicap .3 way..,.*?epr.:.(?<val2>.*?).,");
@@ -217,6 +215,8 @@ namespace GriteAries.BK.Marathone
             {
                 var kod = await _web.GetPageEvent(data.IdEvent);
                 var str = kod.Text;
+
+                data.ClearOld();
 
                 data.P1 = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regP1.Match(str).Groups["val"].Value) };
                 data.P2 = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regP2.Match(str).Groups["val"].Value) };

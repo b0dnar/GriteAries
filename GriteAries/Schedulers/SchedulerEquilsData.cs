@@ -9,7 +9,7 @@ namespace GriteAries.Schedulers
     {
         public static async void Start()
         {
-            DateTime date = DateTime.Now.AddMinutes(3); 
+            DateTime date = DateTime.Now.AddSeconds(100); 
             IScheduler scheduler = await StdSchedulerFactory.GetDefaultScheduler();
             await scheduler.Start();
 

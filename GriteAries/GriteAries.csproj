@@ -195,6 +195,7 @@
     <Compile Include="BK\XBet\XBetWeb.cs" />
     <Compile Include="Job\Job.cs" />
     <Compile Include="Models\Container.cs" />
+    <Compile Include="Models\DataArbitrash.cs" />
     <Compile Include="Models\TypeBK.cs" />
     <Compile Include="Models\TypeSport.cs" />
     <Compile Include="Controllers\HomeController.cs" />

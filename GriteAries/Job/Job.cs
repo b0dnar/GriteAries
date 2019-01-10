@@ -117,7 +117,7 @@ namespace GriteAries
         {
             await Task.Run(() =>
             {
-                List<Data> maxDatas = new List<Data>();
+                List<DataArbitrash> maxDatas = new List<DataArbitrash>();
                 var allFootball = Container.GetUsedDatas(TypeSport.Football);
 
                 foreach (var item in allFootball)
@@ -129,17 +129,25 @@ namespace GriteAries
                 foreach (var data in maxDatas)
                 {
                     SearchArbitrash(data);
+
+                    if(data.Arbitrashes.Count > 0)
+                    {
+
+                    }
                 }
+
+                
             });
         }
 
-        private Data GetMaxData(List<Data> datas)
+        private DataArbitrash GetMaxData(List<Data> datas)
         {
-            Data data = new Data();
+            DataArbitrash data = new DataArbitrash();
 
-            data.Liga = $"{datas[0].Liga}\t{datas[1].Liga}";
-            data.Team1 = $"{datas[0].Team1}\t{datas[1].Team1}";
-            data.Team2 = $"{datas[0].Team2}\t{datas[1].Team2}";
+            data.Liga = datas[0].Liga;
+            data.Team1 = datas[0].Team1;
+            data.Team2 = datas[0].Team2;
+            data.ListUrl = datas.ToDictionary(x => x.Url, x => x.Bukmeker);
 
             data.P1 = GetMaxValue(datas.Select(i => i.P1).ToList());
             data.X = GetMaxValue(datas.Select(i => i.X).ToList());
@@ -153,6 +161,10 @@ namespace GriteAries
             data.TotalsK2 = GetMaxTotals(datas.Select(i => i.TotalsK2).ToList());
             data.AsiatTotals = GetMaxTotals(datas.Select(i => i.AsiatTotals).ToList());
             data.Total3Events = GetMaxTotals(datas.Select(i => i.Total3Events).ToList());
+
+            data.Foras = GetMaxForas(datas.Select(i => i.Foras).ToList());
+            data.AsiatForas = GetMaxForas(datas.Select(i => i.AsiatForas).ToList());
+            data.Handicaps = GetMaxForas(datas.Select(i => i.Handicaps).ToList());
 
             return data;
         }
@@ -282,10 +294,21 @@ namespace GriteAries
                 return new ValueBK(bk:TypeBK.Xbet);
             }
 
-            ValueBK maxValue = values[0];
+            ValueBK maxValue = null;
 
-            for (int i = 1; i < values.Count; i++)
+            for (int i = 0; i < values.Count; i++)
             {
+                if(values[i] == null)
+                {
+                    continue;
+                }
+
+                if(maxValue == null)
+                {
+                    maxValue = values[i];
+                    continue;
+                }
+
                 if (maxValue.Value < values[i].Value)
                 {
                     maxValue = values[i];
@@ -296,71 +319,125 @@ namespace GriteAries
         }
 
 
-        private void SearchArbitrash(Data data)
+        private void SearchArbitrash(DataArbitrash data)
         {
-            string comment = $"{data.Liga}\t{data.Team1}\t{data.Team2}";
-
-            Arbitrash3Event(data.P1.Value, data.X.Value, data.P2.Value, $"{comment}\tP1XP2");
+            var arbitr = Arbitrash3Event(data.P1, data.X, data.P2);
+            if(arbitr != null)
+            {
+                arbitr.Name = "P1XP2";
+                data.Arbitrashes.Add(arbitr);
+            }
 
             foreach (var item in data.Totals)
             {
-                Arbitrash2Event(item.Over.Value, item.Under.Value, $"{comment}\ttotal {item.Name}");
+                var arb = Arbitrash2Event(item.Over, item.Under);
+                if (arb != null)
+                {
+                    arb.Name = $"Total {item.Name}";
+                    data.Arbitrashes.Add(arb);
+                }
             }
             foreach (var item in data.TotalsK1)
             {
-                Arbitrash2Event(item.Over.Value, item.Under.Value, $"{comment}\ttotal team1 {item.Name}");
+                var arb = Arbitrash2Event(item.Over, item.Under);
+                if (arb != null)
+                {
+                    arb.Name = $"Total {item.Name} Team1";
+                    data.Arbitrashes.Add(arb);
+                }
             }
             foreach (var item in data.TotalsK2)
             {
-                Arbitrash2Event(item.Over.Value, item.Under.Value, $"{comment}\ttotal team2 {item.Name}");
+                var arb = Arbitrash2Event(item.Over, item.Under);
+                if (arb != null)
+                {
+                    arb.Name = $"Total {item.Name} Team2";
+                    data.Arbitrashes.Add(arb);
+                }
             }
             foreach (var item in data.AsiatTotals)
             {
-                Arbitrash2Event(item.Over.Value, item.Under.Value, $"{comment}\tasiat total {item.Name}");
+                var arb = Arbitrash2Event(item.Over, item.Under);
+                if (arb != null)
+                {
+                    arb.Name = $"Asiat Total {item.Name}";
+                    data.Arbitrashes.Add(arb);
+                }
             }
             foreach (var item in data.Total3Events)
             {
-                Arbitrash3Event(item.Over.Value, item.Under.Value, item.Exactly.Value, $"{comment}\ttotal 3 event {item.Name}");
+                var arb = Arbitrash3Event(item.Over, item.Exactly, item.Under);
+                if (arb != null)
+                {
+                    arb.Name = $"Total {item.Name} Event3";
+                    data.Arbitrashes.Add(arb);
+                }
             }
 
             foreach (var item in data.Foras)
             {
-                Arbitrash2Event(item.Team1.Value, item.Team2.Value, $"{comment}\fora {item.Name}");
+                var arb = Arbitrash2Event(item.Team1, item.Team2);
+                if (arb != null)
+                {
+                    arb.Name = $"Fora {item.Name}";
+                    data.Arbitrashes.Add(arb);
+                }
             }
             foreach (var item in data.AsiatForas)
             {
-                Arbitrash2Event(item.Team1.Value, item.Team2.Value, $"{comment}\tasiat fora {item.Name}");
+                var arb = Arbitrash2Event(item.Team1, item.Team2);
+                if (arb != null)
+                {
+                    arb.Name = $"Asian Fora {item.Name}";
+                    data.Arbitrashes.Add(arb);
+                }
             }
             foreach (var item in data.Handicaps)
             {
-                Arbitrash3Event(item.Team1.Value, item.Team2.Value, item.Draw.Value, $"{comment}\thandicap {item.Name}");
+                var arb = Arbitrash3Event(item.Team1, item.Draw, item.Team2);
+                if(arb != null)
+                {
+                    arb.Name = $"Handicap {item.Name}";
+                    data.Arbitrashes.Add(arb);
+                }
             }
         }
 
-        private void Arbitrash3Event(float a1, float a2, float a3, string comment)
+        private Arbitrash Arbitrash3Event(ValueBK a1, ValueBK a2, ValueBK a3)
         {
             const int maxProc = 100;
-            var sumKoef = maxProc / a1 + maxProc / a2 + maxProc / a3;
+            var sumKoef = maxProc / a1.Value + maxProc / a2.Value + maxProc / a3.Value;
 
             if (sumKoef >= maxProc)
             {
-                return;
+                return null;
             }
 
-            Console.WriteLine(  );
+            Arbitrash arbitrash = new Arbitrash(TypeArbitrash.Event3);
+            arbitrash.Koef1 = a1;
+            arbitrash.Koef2 = a2;
+            arbitrash.Koef3 = a3;
+            arbitrash.Percent = maxProc - sumKoef;
+
+            return arbitrash;
         }
 
-        private void Arbitrash2Event(float a1, float a2, string comment)
+        private Arbitrash Arbitrash2Event(ValueBK a1, ValueBK a2)
         {
             const int maxProc = 100;
-            var sumKoef = maxProc / a1 + maxProc / a2;
+            var sumKoef = maxProc / a1.Value + maxProc / a2.Value;
 
             if (sumKoef >= maxProc)
             {
-                return;
+                return null;
             }
 
-            Console.WriteLine(  );
+            Arbitrash arbitrash = new Arbitrash(TypeArbitrash.Event2);
+            arbitrash.Koef1 = a1;
+            arbitrash.Koef2 = a2;
+            arbitrash.Percent = maxProc - sumKoef;
+
+            return arbitrash;
         }
 
     }

@@ -154,7 +154,7 @@ namespace GriteAries.BK.XBet
                 {
                     var type = (int)jData[indexData]["T"];
                     var value = jData[indexData]["C"].ToString();
-                    var state = jData[indexData]["B"]?.ToString() ?? "False";
+                    var stateNull = jData[indexData]["B"]?.ToString() ?? "False";
 
                     if (stateNull.Equals("True"))
                     {

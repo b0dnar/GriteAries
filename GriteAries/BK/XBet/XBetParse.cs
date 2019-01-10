@@ -154,6 +154,12 @@ namespace GriteAries.BK.XBet
                 {
                     var type = (int)jData[indexData]["T"];
                     var value = jData[indexData]["C"].ToString();
+                    var state = jData[indexData]["B"]?.ToString() ?? "False";
+
+                    if (stateNull.Equals("True"))
+                    {
+                        continue;
+                    }
 
                     switch (type)
                     {
@@ -197,6 +203,12 @@ namespace GriteAries.BK.XBet
                         var type = (int)item["T"];
                         var name = item["P"]?.ToString() ?? "0";
                         var val = item["C"].ToString();
+                        var stateNull = item["B"]?.ToString() ?? "False";
+
+                        if (stateNull.Equals("True"))
+                        {
+                            continue;
+                        }
 
                         switch (type)
                         {

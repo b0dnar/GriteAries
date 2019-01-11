@@ -96,7 +96,7 @@ namespace GriteAries.BK.XBet
             dataEvent.Liga = eventToken["L"].ToString();
             dataEvent.Team1 = eventToken["O1"].ToString();
             dataEvent.Team2 = eventToken["O2"].ToString();
-            dataEvent.Url = $"https://1xbetua.com/live/Football/{eventToken["LI"].ToString()}-{dataEvent.Liga.Replace(" ", "-").Replace(".","")}/{dataEvent.IdEvent}-{dataEvent.Team1.Replace(" ", "-")}-{dataEvent.Team2.Replace(" ", "-")}/";
+            dataEvent.Url = $"https://1xbetua.com/live/Football/{eventToken["LI"].ToString()}-{dataEvent.Liga.Replace(".", "").Replace(" ", "-")}/{dataEvent.IdEvent}-{dataEvent.Team1.Replace("(Women)", "").Replace(" ", "-")}-{dataEvent.Team2.Replace("(Women)", "").Replace(" ", "-")}/";
 
             var goals = eventToken["SC"]["FS"];
             if (goals.Count() != 0)

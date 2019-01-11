@@ -176,6 +176,11 @@ namespace GriteAries
 
             foreach (var item in allTotals)
             {
+                if (item == null)
+                {
+                    continue;
+                }
+
                 var listName = item.Select(x => x.Name);
                 foreach (var name in listName)
                 {
@@ -405,10 +410,16 @@ namespace GriteAries
 
         private Arbitrash Arbitrash3Event(ValueBK a1, ValueBK a2, ValueBK a3)
         {
+            if (a1 == null || a2 == null || a3 == null)
+            {
+                return null;
+            }
+
             const int maxProc = 100;
             var sumKoef = maxProc / a1.Value + maxProc / a2.Value + maxProc / a3.Value;
+            var difer = maxProc - sumKoef;
 
-            if (sumKoef >= maxProc)
+            if (difer < 0 || difer > 20)
             {
                 return null;
             }
@@ -417,17 +428,23 @@ namespace GriteAries
             arbitrash.Koef1 = a1;
             arbitrash.Koef2 = a2;
             arbitrash.Koef3 = a3;
-            arbitrash.Percent = maxProc - sumKoef;
+            arbitrash.Percent = difer;
 
             return arbitrash;
         }
 
         private Arbitrash Arbitrash2Event(ValueBK a1, ValueBK a2)
         {
+            if (a1 == null || a2 == null)
+            {
+                return null;
+            }
+
             const int maxProc = 100;
             var sumKoef = maxProc / a1.Value + maxProc / a2.Value;
+            var difer = maxProc - sumKoef;
 
-            if (sumKoef >= maxProc)
+            if (difer < 0 || difer > 20)//sumKoef >= maxProc )
             {
                 return null;
             }
@@ -435,7 +452,7 @@ namespace GriteAries
             Arbitrash arbitrash = new Arbitrash(TypeArbitrash.Event2);
             arbitrash.Koef1 = a1;
             arbitrash.Koef2 = a2;
-            arbitrash.Percent = maxProc - sumKoef;
+            arbitrash.Percent = difer;//maxProc - sumKoef;
 
             return arbitrash;
         }

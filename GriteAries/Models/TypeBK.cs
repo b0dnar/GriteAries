@@ -7,6 +7,7 @@ namespace GriteAries.Models
 {
     public enum TypeBK
     {
+        Unknow,
         Marathone,
         Fonbet,
         Xbet

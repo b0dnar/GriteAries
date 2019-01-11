@@ -190,12 +190,12 @@ namespace GriteAries
 
             foreach (var item in allName)
             {
-                var listTot = allTotals.Where(list => list.Any(s => s.Name == item)).SelectMany(d => d).ToList();
+                var listTot = allTotals.Where(list => list.Any(s => s.Name == item)).Select(x => x).ToList();//.SelectMany(d => d).ToList();
                 Total total = new Total();
 
                 total.Name = item;
-                total.Over = GetMaxValue(listTot.Select(x => x.Over).ToList());
-                total.Under = GetMaxValue(listTot.Select(x => x.Under).ToList());
+                //total.Over = GetMaxValue(listTot.Select(x => x.Over).ToList());
+                //total.Under = GetMaxValue(listTot.Select(x => x.Under).ToList());
 
                 totals.Add(total);
             }

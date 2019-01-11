@@ -9,6 +9,22 @@ namespace GriteAries.BK
     public abstract class Bukmeker
     {
 
+        public string GetOppositeForaName(string name)
+        {
+            if (name.Contains("-"))
+            {
+                return name.Replace("-", "+");
+            }
+            else if (name.Contains("+"))
+            {
+                return name.Replace("+", "-");
+            }
+            else
+            {
+                return name;
+            }
+        }
+
         #region Methods Convert
         public ValueBK ConvertToValueBK(TypeBK bk, string value)
         {

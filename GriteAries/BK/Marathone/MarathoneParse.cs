@@ -104,7 +104,7 @@ namespace GriteAries.BK.Marathone
             }
 
             //remove id typeSport
-            if (idEvens.Count > 0)  
+            if (idEvens.Count > 0)
             {
                 idEvens.RemoveAt(0);
             }
@@ -142,8 +142,8 @@ namespace GriteAries.BK.Marathone
                 var nameMatch = regNameTeams.Match(html.Text).Groups["val"].Value;
                 var nameTeams = Regex.Split(nameMatch, " vs ");
 
-                dataEvent.Team1 = nameTeams[0];
-                dataEvent.Team2 = nameTeams[1];
+                dataEvent.Team1 = nameTeams[0].Replace("&amp;", "&");
+                dataEvent.Team2 = nameTeams[1].Replace("&amp;", "&");
 
                 dataEvent.Liga = html.DocumentNode.SelectSingleNode("//h2[@class='category-label']").InnerText;
 
@@ -189,45 +189,55 @@ namespace GriteAries.BK.Marathone
             try
             {
                 var html = await _web.GetPageEvent(data.IdEvent);
-                var el = html.DocumentNode.SelectNodes("//td[@class='price height-column-with-price']");
+                var el = html.DocumentNode.SelectNodes("//td");
+
+                data.ClearOld();
 
                 foreach (var item in el)
                 {
-                    var str = item.Attributes["data-sel"].Value;
+                    var str = item.Attributes["data-sel"]?.Value ?? "";
+                    if (str.Equals(""))
+                    {
+                        continue;
+                    }
+
                     var json = JObject.Parse(str);
                     var typeEvent = json["mn"].ToString();
 
                     switch (typeEvent)
                     {
                         case "Match Result":
-                            SetPX(ref data, json);
+                            SetPX(data, json);
                             break;
                         case "Result":
-                            Set2PX(ref data, json);
+                            Set2PX(data, json);
                             break;
                         case "Total Goals":
-                            SetTotal(ref data, json);
+                            SetTotal(data.Totals, json);
                             break;
                         case "Total Goals (3 way)":
-                            SetTotal3Ev(ref data, json);
+                            SetTotal(data.Total3Events, json);
                             break;
                         case "Asian Total Goals":
-                            SetAsTotal(ref data, json);
+                            SetTotal(data.AsiatTotals, json);
                             break;
                         case "To Win Match With Handicap":
+                            SetFora(data.Foras, json, data.Team1, data.Team2);
                             break;
                         case "To Win Match With Handicap (3 way)":
+                            SetFora(data.Handicaps, json, data.Team1, data.Team2);
                             break;
                         case "To Win Match With Asian Handicap":
+                            SetFora(data.AsiatForas, json, data.Team1, data.Team2);
                             break;
                         default:
                             if (typeEvent.Equals($"Total Goals ({data.Team1})"))
                             {
-
+                                SetTotal(data.TotalsK1, json);
                             }
                             else if (typeEvent.Equals($"Total Goals ({data.Team2})"))
                             {
-
+                                SetTotal(data.TotalsK2, json);
                             }
                             break;
                     }
@@ -240,7 +250,7 @@ namespace GriteAries.BK.Marathone
             }
         }
 
-        private void SetPX(ref Data data, JObject json)
+        private void SetPX(Data data, JObject json)
         {
             var name = json["sn"].ToString();
             var value = json["epr"].ToString();
@@ -259,7 +269,7 @@ namespace GriteAries.BK.Marathone
             }
         }
 
-        private void Set2PX(ref Data data, JObject json)
+        private void Set2PX(Data data, JObject json)
         {
             var name = json["sn"].ToString();
             var value = json["epr"].ToString();
@@ -278,22 +288,33 @@ namespace GriteAries.BK.Marathone
             }
         }
 
-        private void SetTotal(ref Data data, JObject json)
+        private void SetTotal(List<Total> totals, JObject json)
         {
             var name = json["sn"].ToString();
             var value = json["epr"].ToString();
             string nameTot = name.Replace("Over ", "").Replace("Under ", "");
 
-            var tot = data.Totals.FirstOrDefault(x => x.Name == nameTot);
+            if(name.Equals("Odd") || name.Equals("Even"))
+            {
+                return;
+            }
+
+            if (nameTot.Contains(","))
+            {
+                var temp = nameTot.Split(',');
+                nameTot = Convert.ToString((ConvertToFloat(temp[0]) + ConvertToFloat(temp[1])) / 2);
+            }
+
+            var tot = totals.FirstOrDefault(x => x.Name == nameTot);
             if (tot == null)
             {
                 if (name.Contains("Over"))
                 {
-                    data.Totals.Add(new Total{Name = nameTot, Over = ConvertToValueBK(TypeBK.Marathone, value)});
+                    totals.Add(new Total { Name = nameTot, Over = ConvertToValueBK(TypeBK.Marathone, value) });
                 }
                 else
                 {
-                    data.Totals.Add(new Total { Name = nameTot, Under = ConvertToValueBK(TypeBK.Marathone, value) });
+                    totals.Add(new Total { Name = nameTot, Under = ConvertToValueBK(TypeBK.Marathone, value) });
                 }
             }
             else
@@ -309,26 +330,26 @@ namespace GriteAries.BK.Marathone
             }
         }
 
-        private void SetTotal3Ev(ref Data data, JObject json)
+        private void SetTotal(List<Total3Event> totals, JObject json)
         {
             var name = json["sn"].ToString();
             var value = json["epr"].ToString();
             string nameTot = name.Replace("Over ", "").Replace("Under ", "").Replace("Exactly ", "");
 
-            var tot = data.Total3Events.FirstOrDefault(x => x.Name == nameTot);
+            var tot = totals.FirstOrDefault(x => x.Name == nameTot);
             if (tot == null)
             {
                 if (name.Contains("Over"))
                 {
-                    data.Total3Events.Add(new Total3Event { Name = nameTot, Over = ConvertToValueBK(TypeBK.Marathone, value) });
+                    totals.Add(new Total3Event { Name = nameTot, Over = ConvertToValueBK(TypeBK.Marathone, value) });
                 }
                 else if (name.Contains("Under"))
                 {
-                    data.Total3Events.Add(new Total3Event { Name = nameTot, Under = ConvertToValueBK(TypeBK.Marathone, value) });
+                    totals.Add(new Total3Event { Name = nameTot, Under = ConvertToValueBK(TypeBK.Marathone, value) });
                 }
                 else
                 {
-                    data.Total3Events.Add(new Total3Event { Name = nameTot, Exactly = ConvertToValueBK(TypeBK.Marathone, value) });
+                    totals.Add(new Total3Event { Name = nameTot, Exactly = ConvertToValueBK(TypeBK.Marathone, value) });
                 }
             }
             else
@@ -348,280 +369,97 @@ namespace GriteAries.BK.Marathone
             }
         }
 
-        private void SetAsTotal(ref Data data, JObject json)
+        private void SetFora(List<Fora> foras, JObject json, string name1, string name2)
         {
             var name = json["sn"].ToString();
             var value = json["epr"].ToString();
+            string nameFora = name.Replace($"{name1} (", "").Replace($"{name2} (", "").Replace(")", "");
 
-            string nameTot = name.Replace("Over ", "").Replace("Under ", "");
-            var temp = nameTot.Split(',');
-            nameTot = Convert.ToString((ConvertToFloat(temp[0]) + ConvertToFloat(temp[1])) / 2);
-
-            var tot = data.AsiatTotals.FirstOrDefault(x => x.Name == nameTot);
-            if (tot == null)
+            if(nameFora.Contains(","))
             {
-                if (name.Contains("Over"))
+                var temp = nameFora.Split(',');
+                nameFora = Convert.ToString((ConvertToFloat(temp[0]) + ConvertToFloat(temp[1])) / 2);
+                if(temp[0].Contains("+") || temp[1].Contains("+"))
                 {
-                    data.AsiatTotals.Add(new Total { Name = nameTot, Over = ConvertToValueBK(TypeBK.Marathone, value) });
+                    nameFora = $"+{nameFora}";
                 }
-                else
+            }
+
+            if (name.Contains(name2))
+            {
+                nameFora = GetOppositeForaName(nameFora);
+            }
+
+            Fora fora = foras.FirstOrDefault(x => x.Name == nameFora);
+
+            if (fora == null)
+            {
+                if (name.Contains(name1))
                 {
-                    data.AsiatTotals.Add(new Total { Name = nameTot, Under = ConvertToValueBK(TypeBK.Marathone, value) });
+                    foras.Add(new Fora { Name = nameFora, Team1 = ConvertToValueBK(TypeBK.Marathone, value) });
+                }
+                else 
+                {
+                    foras.Add(new Fora { Name = nameFora, Team2 = ConvertToValueBK(TypeBK.Marathone, value) });
                 }
             }
             else
             {
-                if (name.Contains("Over"))
+                if (name.Contains(name1))
                 {
-                    tot.Over = ConvertToValueBK(TypeBK.Marathone, value);
+                    fora.Team1 = ConvertToValueBK(TypeBK.Marathone, value);
                 }
                 else
                 {
-                    tot.Under = ConvertToValueBK(TypeBK.Marathone, value);
+                    fora.Team2 = ConvertToValueBK(TypeBK.Marathone, value);
                 }
             }
         }
 
-        //public async Task SetKoeficient1(Data data)
-        //{
-
-        //    Regex regForaAs1 = new Regex($"{data.Team1}..(?<val1>.*?)..,.mn.:.To Win Match With Asian Handicap.,.*?epr.:.(?<val2>.*?).,");
-        //    Regex regForaAs2 = new Regex($"{data.Team2}..(?<val1>.*?)..,.mn.:.To Win Match With Asian Handicap.,.*?epr.:.(?<val2>.*?).,");
-
-
-        //    try
-        //    {
-        //        var kod = await _web.GetPageEvent(data.IdEvent);
-        //        var str = kod.Text;
-
-        //        data.ClearOld();
-
-        //        data.P1 = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regP1.Match(str).Groups["val"].Value) };
-        //        data.P2 = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regP2.Match(str).Groups["val"].Value) };
-        //        data.X = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regX.Match(str).Groups["val"].Value) };
-        //        data.X1 = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regP1X.Match(str).Groups["val"].Value) };
-        //        data.P12 = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regP12.Match(str).Groups["val"].Value) };
-        //        data.X2 = new ValueBK { BK = TypeBK.Marathone, Value = ConvertToFloat(regP2X.Match(str).Groups["val"].Value) };
-
-        //        if (str.Contains("\"To Win Match With Handicap\""))
-        //        {
-        //            data.Foras.AddRange(GetFora(str, regFora1, regFora2));
-        //        }
-
-        //        if (str.Contains("\"To Win Match With Handicap (3 way)\""))
-        //        {
-        //            data.Handicaps.AddRange(GetHandicap(str, regHand1, regHand2, regHandD));
-        //        }
-
-        //        if (str.Contains("\"To Win Match With Asian Handicap\""))
-        //        {
-        //            data.AsiatForas.AddRange(GetFora(str, regForaAs1, regForaAs2));
-        //        }
-
-        //        if (str.Contains("\"Total Goals\""))
-        //        {
-        //            data.Totals.AddRange(GetTotal(str, regTotB, regTotM));
-        //        }
-
-        //        if (str.Contains("\"Total Goals (3 way)\""))
-        //        {
-        //            data.Total3Events.AddRange(GetTot3Event(str, regTot3B, regTot3M, regTot3E));
-        //        }
-
-        //        if (str.Contains("\"Asian Total Goals\""))
-        //        {
-        //            data.AsiatTotals.AddRange(GetTotal(str, regTotAsB, regTotAsM));
-        //        }
-
-        //        if (str.Contains("\"Total Goals (" + data.Team1 + ")\""))
-        //        {
-        //            data.TotalsK1.AddRange(GetTotal(str, regTotT1B, regTotT1M));
-        //        }
-
-        //        if (str.Contains("\"Total Goals (" + data.Team2 + ")\""))
-        //        {
-        //            data.TotalsK2.AddRange(GetTotal(str, regTotT2B, regTotT2M));
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        string log = $"Error in parse koef\n{e.ToString()}";
-        //        await _logging.WriteLog(log);
-        //    }
-        //}
-
-        #region Methods from Fora
-        public List<Fora> GetFora(string str, Regex reg1, Regex reg2)
+        private void SetFora(List<Handicap> foras, JObject json, string name1, string name2)
         {
-            List<Fora> list = new List<Fora>();
+            var name = json["sn"].ToString();
+            var value = json["epr"].ToString();
+            string nameFora = name.Replace($"{name1} (", "").Replace($"{name2} (", "").Replace("Draw (", "").Replace(")", "");
 
-            var collFora1 = reg1.Matches(str);
-            var collFora2 = reg2.Matches(str);
-
-            for (int i = 0; i < collFora1.Count; i++)
+            if (name.Contains(name2))
             {
-                Fora fora = new Fora();
+                nameFora = GetOppositeForaName(nameFora);
+            }
 
-                string nameFora = collFora1[i].Groups["val1"].Value;
-
-                if (nameFora.Contains(","))
+            Handicap fora = foras.FirstOrDefault(x => x.Name == nameFora);
+            
+            if (fora == null)
+            {
+                if (name.Contains(name1))
                 {
-                    string[] name = collFora1[i].Groups["val1"].Value.Split(',');
-
-                    if (name[0].Contains("-") || name[1].Contains("-"))
-                    {
-                        fora.Name = Convert.ToString((ConvertToFloat(name[0]) + ConvertToFloat(name[1])) / 2);
-                    }
-                    else
-                    {
-                        fora.Name = "+" + Convert.ToString((ConvertToFloat(name[0]) + ConvertToFloat(name[1])) / 2);
-                    }
+                    foras.Add(new Handicap { Name = nameFora, Team1 = ConvertToValueBK(TypeBK.Marathone, value) });
+                }
+                else if (name.Contains(name2))
+                {
+                    foras.Add(new Handicap { Name = nameFora, Team2 = ConvertToValueBK(TypeBK.Marathone, value) });
                 }
                 else
                 {
-                    fora.Name = nameFora;
+                    foras.Add(new Handicap { Name = nameFora, Draw = ConvertToValueBK(TypeBK.Marathone, value) });
                 }
-
-                var fora1 = collFora1[i].Groups["val2"].Value;
-                fora.Team1 = ConvertToValueBK(TypeBK.Marathone, fora1);
-
-                var fora2 = 
-                fora.Team2 = GetValueFora(collFora2, collFora1[i].Groups["val1"].Value);
-
-                list.Add(fora);
-            }
-
-            return list;
-        }
-
-        public List<Handicap> GetHandicap(string str, Regex reg1, Regex reg2, Regex reg3)
-        {
-            List<Handicap> list = new List<Handicap>();
-
-            var collHand1 = reg1.Matches(str);
-            var collHand2 = reg2.Matches(str);
-            var collHandD = reg3.Matches(str);
-
-            for (int i = 0; i < collHand1.Count; i++)
-            {
-                Handicap handicap = new Handicap();
-
-                handicap.Name = collHand1[i].Groups["val1"].Value;
-
-                var team1 = collHand1[i].Groups["val2"].Value;
-                handicap.Team1 = ConvertToValueBK(TypeBK.Marathone, team1);
-
-                handicap.Team2 = GetValueFora(collHand2, handicap.Name);
-
-                var draw = collHandD.Cast<Match>()
-                    .FirstOrDefault(x => x.Groups["val1"].Value
-                    .Equals(handicap.Name)).Groups["val2"].Value;
-                handicap.Draw = ConvertToValueBK(TypeBK.Marathone, draw);
-
-                list.Add(handicap);
-            }
-
-            return list;
-        }
-
-        public ValueBK GetValueFora(MatchCollection match, string name1)
-        {
-            ValueBK valueBK = new ValueBK(TypeBK.Marathone);
-
-            if (match.Count == 0)
-            {
-                valueBK.Value = 0;
             }
             else
             {
-                string temp;
-                if (name1.Contains("-"))
+                if (name.Contains(name1))
                 {
-                    temp = name1.Replace("-", "+");
+                    fora.Team1 = ConvertToValueBK(TypeBK.Marathone, value);
+                }
+                else if (name.Contains(name2))
+                {
+                    fora.Team2 = ConvertToValueBK(TypeBK.Marathone, value);
                 }
                 else
                 {
-                    temp = name1.Replace("+", "-");
+                    fora.Draw = ConvertToValueBK(TypeBK.Marathone, value);
                 }
-
-                valueBK.Value = ConvertToFloat(match.Cast<Match>()
-                    .FirstOrDefault(x => x.Groups["val1"].Value
-                    .Equals(temp)).Groups["val2"].Value);
             }
-
-            return valueBK;
         }
-
-        #endregion
-
-        #region Methods from Total
-        public List<Total> GetTotal(string str, Regex reg1, Regex reg2)
-        {
-            List<Total> list = new List<Total>();
-            var collTotB = reg1.Matches(str);
-            var collTotM = reg2.Matches(str);
-
-            for (int i = 0; i < collTotB.Count; i++)
-            {
-                Total total = new Total();
-                string temp = collTotB[i].Groups["val1"].Value;
-
-                if (temp.Contains(","))
-                {
-                    string[] name = temp.Split(',');
-                    total.Name = Convert.ToString((ConvertToFloat(name[0]) + ConvertToFloat(name[1])) / 2);
-                }
-                else
-                {
-                    total.Name = temp;
-                }
-
-                var valOver = collTotB[i].Groups["val2"].Value;
-                total.Over = ConvertToValueBK(TypeBK.Marathone, valOver);
-
-                var valUnder = collTotM.Cast<Match>()
-                    .FirstOrDefault(x => x.Groups["val1"].Value
-                    .Equals(temp)).Groups["val2"].Value;
-                total.Under = ConvertToValueBK(TypeBK.Marathone, valUnder);
-
-                list.Add(total);
-            }
-
-            return list;
-        }
-
-        public List<Total3Event> GetTot3Event(string str, Regex reg1, Regex reg2, Regex reg3)
-        {
-            List<Total3Event> list = new List<Total3Event>();
-            var collTotB = reg1.Matches(str);
-            var collTotM = reg2.Matches(str);
-            var collTotE = reg3.Matches(str);
-
-            for (int i = 0; i < collTotB.Count; i++)
-            {
-                Total3Event total = new Total3Event();
-
-                total.Name = collTotB[i].Groups["val1"].Value;
-
-                var valOver = collTotB[i].Groups["val2"].Value;
-                total.Over = ConvertToValueBK(TypeBK.Marathone, valOver);
-
-                var valUnder = collTotM.Cast<Match>()
-                    .FirstOrDefault(x => x.Groups["val1"].Value
-                    .Equals(total.Name)).Groups["val2"].Value;
-                total.Under = ConvertToValueBK(TypeBK.Marathone, valUnder);
-
-                var valExact = collTotE.Cast<Match>()
-                    .FirstOrDefault(x => x.Groups["val1"].Value
-                    .Equals(total.Name)).Groups["val2"].Value;
-                total.Exactly = ConvertToValueBK(TypeBK.Marathone, valExact);
-
-                list.Add(total);
-            }
-            return list;
-        }
-        #endregion
-
     }
 
 }

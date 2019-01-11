@@ -213,212 +213,58 @@ namespace GriteAries.BK.XBet
                         switch (type)
                         {
                             case indexTotB:
-                                var elTotB = data.Totals.FirstOrDefault(x => x.Name == name);
-                                if (elTotB == null)
-                                {
-                                    data.Totals.Add(new Total { Name = name, Over = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    elTotB.Over = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetTotal(data.Totals, name, val, true);
                                 break;
                             case indexTotM:
-                                var elTotM = data.Totals.FirstOrDefault(x => x.Name == name);
-                                if (elTotM == null)
-                                {
-                                    data.Totals.Add(new Total { Name = name, Under = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    elTotM.Under = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetTotal(data.Totals, name, val, false);
                                 break;
                             case indexTot1B:
-                                var elTot1B = data.TotalsK1.FirstOrDefault(x => x.Name == name);
-                                if (elTot1B == null)
-                                {
-                                    data.TotalsK1.Add(new Total { Name = name, Over = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    elTot1B.Over = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetTotal(data.TotalsK1, name, val, true);
                                 break;
                             case indexTot1M:
-                                var elTot1M = data.TotalsK1.FirstOrDefault(x => x.Name == name);
-                                if (elTot1M == null)
-                                {
-                                    data.TotalsK1.Add(new Total { Name = name, Under = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    elTot1M.Under = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetTotal(data.TotalsK1, name, val, false);
                                 break;
                             case indexTot2B:
-                                var elTot2B = data.TotalsK2.FirstOrDefault(x => x.Name == name);
-                                if (elTot2B == null)
-                                {
-                                    data.TotalsK2.Add(new Total { Name = name, Over = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    elTot2B.Over = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetTotal(data.TotalsK2, name, val, true);
                                 break;
                             case indexTot2M:
-                                var elTot2M = data.TotalsK2.FirstOrDefault(x => x.Name == name);
-                                if (elTot2M == null)
-                                {
-                                    data.TotalsK2.Add(new Total { Name = name, Under = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    elTot2M.Under = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetTotal(data.TotalsK2, name, val, false);
                                 break;
                             case index3TotB:
-                                var el3TotB = data.Total3Events.FirstOrDefault(x => x.Name == name);
-                                if (el3TotB == null)
-                                {
-                                    data.Total3Events.Add(new Total3Event { Name = name, Over = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    el3TotB.Over = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetTotal(data.Total3Events, name, val, "Over");
                                 break;
                             case index3TotEq:
-                                var el3TotEq = data.Total3Events.FirstOrDefault(x => x.Name == name);
-                                if (el3TotEq == null)
-                                {
-                                    data.Total3Events.Add(new Total3Event { Name = name, Exactly = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    el3TotEq.Exactly = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetTotal(data.Total3Events, name, val, "Exactly");
                                 break;
                             case index3TotM:
-                                var el3TotM = data.Total3Events.FirstOrDefault(x => x.Name == name);
-                                if (el3TotM == null)
-                                {
-                                    data.Total3Events.Add(new Total3Event { Name = name, Under = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    el3TotM.Under = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetTotal(data.Total3Events, name, val, "Under");
                                 break;
                             case indexAsTotB:
-                                var elAsTotB = data.AsiatTotals.FirstOrDefault(x => x.Name == name);
-                                if (elAsTotB == null)
-                                {
-                                    data.AsiatTotals.Add(new Total { Name = name, Over = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    elAsTotB.Over = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetTotal(data.AsiatTotals, name, val, true);
                                 break;
                             case indexAsTotM:
-                                var elAsTotM = data.AsiatTotals.FirstOrDefault(x => x.Name == name);
-                                if (elAsTotM == null)
-                                {
-                                    data.AsiatTotals.Add(new Total { Name = name, Under = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    elAsTotM.Under = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetTotal(data.AsiatTotals, name, val, false);
                                 break;
                             case indexFora1:
-                                name = name[0] == '-' ? name : $"+{name}";
-                                var oppositeFora1 = GetOppositeForaName(name);
-                                var elFora1 = data.Foras.FirstOrDefault(x => x.Name == oppositeFora1);
-                                if (elFora1 == null)
-                                {
-                                    data.Foras.Add(new Fora { Name = name, Team1 = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    elFora1.Name = name;
-                                    elFora1.Team1 = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetFora(data.Foras, name, val, true);
                                 break;
                             case indexFora2:
-                                name = name[0] == '-' ? name : $"+{name}";
-                                var oppositeFora2 = GetOppositeForaName(name);
-                                var elFora2 = data.Foras.FirstOrDefault(x => x.Name == oppositeFora2);
-                                if (elFora2 == null)
-                                {
-                                    data.Foras.Add(new Fora { Name = name, Team2 = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    elFora2.Team2 = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetFora(data.Foras, name, val, false);
                                 break;
                             case indexAsFora1:
-                                name = name[0] == '-' ? name : $"+{name}";
-                                var oppositeAsFora1 = GetOppositeForaName(name);
-                                var elAsFora1 = data.AsiatForas.FirstOrDefault(x => x.Name == oppositeAsFora1);
-                                if (elAsFora1 == null)
-                                {
-                                    data.AsiatForas.Add(new Fora { Name = name, Team1 = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    elAsFora1.Name = name;
-                                    elAsFora1.Team1 = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetFora(data.AsiatForas, name, val, true);
                                 break;
                             case indexAsFora2:
-                                name = name[0] == '-' ? name : $"+{name}";
-                                var oppositeAsFora2 = GetOppositeForaName(name);
-                                var elAsFora2 = data.AsiatForas.FirstOrDefault(x => x.Name == oppositeAsFora2);
-                                if (elAsFora2 == null)
-                                {
-                                    data.AsiatForas.Add(new Fora { Name = name, Team2 = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    elAsFora2.Team2 = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetFora(data.AsiatForas, name, val, false);
                                 break;
                             case index3Fora1:
-                                var el3Fora1 = data.Handicaps.FirstOrDefault(x => x.Name == name);
-                                if (el3Fora1 == null)
-                                {
-                                    data.Handicaps.Add(new Handicap { Name = name, Team1 = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    el3Fora1.Team1 = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetFora(data.Handicaps, name, val, "Team1");
                                 break;
                             case index3ForaEq:
-                                var el3ForaEq = data.Handicaps.FirstOrDefault(x => x.Name == name);
-                                if (el3ForaEq == null)
-                                {
-                                    data.Handicaps.Add(new Handicap { Name = name, Draw = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    el3ForaEq.Draw = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetFora(data.Handicaps, name, val, "Draw");
                                 break;
                             case index3Fora2:
-                                var el3Fora2 = data.Foras.FirstOrDefault(x => x.Name == name);
-                                if (el3Fora2 == null)
-                                {
-                                    data.Handicaps.Add(new Handicap { Name = name, Team2 = ConvertToValueBK(TypeBK.Xbet, val) });
-                                }
-                                else
-                                {
-                                    el3Fora2.Team2 = ConvertToValueBK(TypeBK.Xbet, val);
-                                }
+                                SetFora(data.Handicaps, name, val, "Team2");
                                 break;
                             default:
                                 break;
@@ -430,18 +276,148 @@ namespace GriteAries.BK.XBet
             {
 
             }
-
         }
 
-        private string GetOppositeForaName(string name)
+        private void SetTotal(List<Total> totals, string name, string value, bool stateOver)
         {
-            if (name.Contains("-"))
+            var tot = totals.FirstOrDefault(x => x.Name == name);
+
+            if (tot == null)
             {
-                return name.Replace("-", "+");
+                if (stateOver)
+                {
+                    totals.Add(new Total { Name = name, Over = ConvertToValueBK(TypeBK.Marathone, value) });
+                }
+                else
+                {
+                    totals.Add(new Total { Name = name, Under = ConvertToValueBK(TypeBK.Marathone, value) });
+                }
             }
             else
             {
-                return name.Replace("+", "-");
+                if (stateOver)
+                {
+                    tot.Over = ConvertToValueBK(TypeBK.Marathone, value);
+                }
+                else
+                {
+                    tot.Under = ConvertToValueBK(TypeBK.Marathone, value);
+                }
+            }
+        }
+
+        private void SetTotal(List<Total3Event> totals, string name, string value, string typeEv)
+        {
+            var tot = totals.FirstOrDefault(x => x.Name == name);
+
+            if (tot == null)
+            {
+                if (typeEv.Contains("Over"))
+                {
+                    totals.Add(new Total3Event { Name = name, Over = ConvertToValueBK(TypeBK.Marathone, value) });
+                }
+                else if (name.Contains("Under"))
+                {
+                    totals.Add(new Total3Event { Name = name, Under = ConvertToValueBK(TypeBK.Marathone, value) });
+                }
+                else
+                {
+                    totals.Add(new Total3Event { Name = name, Exactly = ConvertToValueBK(TypeBK.Marathone, value) });
+                }
+            }
+            else
+            {
+                if (name.Contains("Over"))
+                {
+                    tot.Over = ConvertToValueBK(TypeBK.Marathone, value);
+                }
+                else if (name.Contains("Under"))
+                {
+                    tot.Under = ConvertToValueBK(TypeBK.Marathone, value);
+                }
+                else
+                {
+                    tot.Exactly = ConvertToValueBK(TypeBK.Marathone, value);
+                }
+            }
+        }
+
+        private void SetFora(List<Fora> foras, string name, string value, bool stateTeam1)
+        {
+            if (!name.Equals("0"))
+            {
+                name = name[0] == '-' ? name : $"+{name}";
+            }
+
+            if (!stateTeam1)
+            {
+                name = GetOppositeForaName(name);
+            }
+
+            var fora = foras.FirstOrDefault(x => x.Name == name);
+
+            if (fora == null)
+            {
+                if (stateTeam1)
+                {
+                    foras.Add(new Fora { Name = name, Team1 = ConvertToValueBK(TypeBK.Marathone, value) });
+                }
+                else
+                {
+                    foras.Add(new Fora { Name = name, Team2 = ConvertToValueBK(TypeBK.Marathone, value) });
+                }
+            }
+            else
+            {
+                if (stateTeam1)
+                {
+                    fora.Team1 = ConvertToValueBK(TypeBK.Marathone, value);
+                }
+                else
+                {
+                    fora.Team2 = ConvertToValueBK(TypeBK.Marathone, value);
+                }
+            }
+        }
+
+        private void SetFora(List<Handicap> foras, string name, string value, string typeEv)
+        {
+            if (!name.Equals("0"))
+            {
+                name = name[0] == '-' ? name : $"+{name}";
+            }
+
+            var fora = foras.FirstOrDefault(x => x.Name == name);
+
+            if (fora == null)
+            {
+                if (typeEv.Equals("Team1"))
+                {
+                    foras.Add(new Handicap { Name = name, Team1 = ConvertToValueBK(TypeBK.Marathone, value) });
+                }
+                else if (typeEv.Equals("Team2"))
+                {
+                    foras.Add(new Handicap { Name = name, Team2 = ConvertToValueBK(TypeBK.Marathone, value) });
+                }
+                else
+                {
+                    foras.Add(new Handicap { Name = name, Draw = ConvertToValueBK(TypeBK.Marathone, value) });
+                }
+            }
+            else
+            {
+                if (typeEv.Equals("Team1"))
+                {
+                    fora.Team1 = ConvertToValueBK(TypeBK.Marathone, value);
+                }
+                else if (typeEv.Equals("Team2"))
+                {
+                    fora.Team2 = ConvertToValueBK(TypeBK.Marathone, value);
+                }
+                else
+                {
+                    fora.Draw = ConvertToValueBK(TypeBK.Marathone, value);
+                }
             }
         }
     }

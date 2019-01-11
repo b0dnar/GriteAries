@@ -32,6 +32,12 @@ namespace GriteAries.Models
 
         public Data()
         {
+            P1 = new ValueBK();
+            P2 = new ValueBK();
+            X = new ValueBK();
+            P12 = new ValueBK();
+            X2 = new ValueBK();
+            X1 = new ValueBK();
             Totals = new List<Total>();
             AsiatTotals = new List<Total>();
             TotalsK1 = new List<Total>();

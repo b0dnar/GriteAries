@@ -8,6 +8,7 @@ namespace GriteAries.Models
 {
     public static class Container
     {
+        public static List<DataArbitrash> listArbitrashData;
         public static List<UsedData> listUsedFootball;
         public static List<int> marathoneUsedIdEvents { get; set; }
         public static List<int> xbetUsedIdEvents{ get; set; }
@@ -15,6 +16,7 @@ namespace GriteAries.Models
 
         static Container()
         {
+            listArbitrashData = new List<DataArbitrash>();
             listUsedFootball = new List<UsedData>();
             marathoneUsedIdEvents = new List<int>();
             xbetUsedIdEvents = new List<int>();
@@ -68,6 +70,16 @@ namespace GriteAries.Models
                 default:
                     return null;
             }
+        }
+
+        public static void SetDataArbitrash(List<DataArbitrash> list)
+        {
+            listArbitrashData = list;
+        }
+
+        public static List<DataArbitrash> GetDataArbitrash()
+        {
+            return listArbitrashData;
         }
     }
 

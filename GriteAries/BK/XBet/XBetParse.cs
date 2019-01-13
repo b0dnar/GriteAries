@@ -96,7 +96,7 @@ namespace GriteAries.BK.XBet
             dataEvent.Liga = eventToken["L"].ToString();
             dataEvent.Team1 = eventToken["O1"].ToString();
             dataEvent.Team2 = eventToken["O2"].ToString();
-            dataEvent.Url = $"https://1xbetua.com/live/Football/{eventToken["LI"].ToString()}-{dataEvent.Liga.Replace(".", "").Replace(" ", "-")}/{dataEvent.IdEvent}-{dataEvent.Team1.Replace("(Women)", "").Replace(" ", "-")}-{dataEvent.Team2.Replace("(Women)", "").Replace(" ", "-")}/";
+            dataEvent.Url = $"https://1xbetua.com/live/Football/{eventToken["LI"].ToString()}-{dataEvent.Liga.Replace(".", "").Replace(" ", "-")}/{dataEvent.IdEvent}-{dataEvent.Team1.Replace("(", "").Replace(")", "").Replace(" ", "-")}-{dataEvent.Team2.Replace("(", "").Replace(")", "").Replace(" ", "-")}/";
 
             var goals = eventToken["SC"]["FS"];
             if (goals.Count() != 0)
@@ -107,6 +107,11 @@ namespace GriteAries.BK.XBet
 
             int milisec = Convert.ToInt32(eventToken["SC"]["TS"]?.ToString() ?? "0");
             dataEvent.MinuteMatch = milisec / 60;
+
+            if (dataEvent.MinuteMatch > MaxMinuteMatchFootball)
+            {
+                return null;
+            }
 
             return dataEvent;
         }
@@ -122,6 +127,9 @@ namespace GriteAries.BK.XBet
                 var json = JObject.Parse(kod);
                 var arrEvents = (JArray)json["Value"]["GE"];
                 data.ClearOld();
+
+                int milisec = Convert.ToInt32(json["Value"]["SC"]["TS"]?.ToString() ?? "0");
+                data.MinuteMatch = milisec / 60;
 
                 foreach (var even in arrEvents)
                 {
@@ -286,22 +294,22 @@ namespace GriteAries.BK.XBet
             {
                 if (stateOver)
                 {
-                    totals.Add(new Total { Name = name, Over = ConvertToValueBK(TypeBK.Marathone, value) });
+                    totals.Add(new Total { Name = name, Over = ConvertToValueBK(TypeBK.Xbet, value) });
                 }
                 else
                 {
-                    totals.Add(new Total { Name = name, Under = ConvertToValueBK(TypeBK.Marathone, value) });
+                    totals.Add(new Total { Name = name, Under = ConvertToValueBK(TypeBK.Xbet, value) });
                 }
             }
             else
             {
                 if (stateOver)
                 {
-                    tot.Over = ConvertToValueBK(TypeBK.Marathone, value);
+                    tot.Over = ConvertToValueBK(TypeBK.Xbet, value);
                 }
                 else
                 {
-                    tot.Under = ConvertToValueBK(TypeBK.Marathone, value);
+                    tot.Under = ConvertToValueBK(TypeBK.Xbet, value);
                 }
             }
         }
@@ -314,30 +322,30 @@ namespace GriteAries.BK.XBet
             {
                 if (typeEv.Contains("Over"))
                 {
-                    totals.Add(new Total3Event { Name = name, Over = ConvertToValueBK(TypeBK.Marathone, value) });
+                    totals.Add(new Total3Event { Name = name, Over = ConvertToValueBK(TypeBK.Xbet, value) });
                 }
                 else if (name.Contains("Under"))
                 {
-                    totals.Add(new Total3Event { Name = name, Under = ConvertToValueBK(TypeBK.Marathone, value) });
+                    totals.Add(new Total3Event { Name = name, Under = ConvertToValueBK(TypeBK.Xbet, value) });
                 }
                 else
                 {
-                    totals.Add(new Total3Event { Name = name, Exactly = ConvertToValueBK(TypeBK.Marathone, value) });
+                    totals.Add(new Total3Event { Name = name, Exactly = ConvertToValueBK(TypeBK.Xbet, value) });
                 }
             }
             else
             {
                 if (name.Contains("Over"))
                 {
-                    tot.Over = ConvertToValueBK(TypeBK.Marathone, value);
+                    tot.Over = ConvertToValueBK(TypeBK.Xbet, value);
                 }
                 else if (name.Contains("Under"))
                 {
-                    tot.Under = ConvertToValueBK(TypeBK.Marathone, value);
+                    tot.Under = ConvertToValueBK(TypeBK.Xbet, value);
                 }
                 else
                 {
-                    tot.Exactly = ConvertToValueBK(TypeBK.Marathone, value);
+                    tot.Exactly = ConvertToValueBK(TypeBK.Xbet, value);
                 }
             }
         }
@@ -360,22 +368,22 @@ namespace GriteAries.BK.XBet
             {
                 if (stateTeam1)
                 {
-                    foras.Add(new Fora { Name = name, Team1 = ConvertToValueBK(TypeBK.Marathone, value) });
+                    foras.Add(new Fora { Name = name, Team1 = ConvertToValueBK(TypeBK.Xbet, value) });
                 }
                 else
                 {
-                    foras.Add(new Fora { Name = name, Team2 = ConvertToValueBK(TypeBK.Marathone, value) });
+                    foras.Add(new Fora { Name = name, Team2 = ConvertToValueBK(TypeBK.Xbet, value) });
                 }
             }
             else
             {
                 if (stateTeam1)
                 {
-                    fora.Team1 = ConvertToValueBK(TypeBK.Marathone, value);
+                    fora.Team1 = ConvertToValueBK(TypeBK.Xbet, value);
                 }
                 else
                 {
-                    fora.Team2 = ConvertToValueBK(TypeBK.Marathone, value);
+                    fora.Team2 = ConvertToValueBK(TypeBK.Xbet, value);
                 }
             }
         }
@@ -393,30 +401,30 @@ namespace GriteAries.BK.XBet
             {
                 if (typeEv.Equals("Team1"))
                 {
-                    foras.Add(new Handicap { Name = name, Team1 = ConvertToValueBK(TypeBK.Marathone, value) });
+                    foras.Add(new Handicap { Name = name, Team1 = ConvertToValueBK(TypeBK.Xbet, value) });
                 }
                 else if (typeEv.Equals("Team2"))
                 {
-                    foras.Add(new Handicap { Name = name, Team2 = ConvertToValueBK(TypeBK.Marathone, value) });
+                    foras.Add(new Handicap { Name = name, Team2 = ConvertToValueBK(TypeBK.Xbet, value) });
                 }
                 else
                 {
-                    foras.Add(new Handicap { Name = name, Draw = ConvertToValueBK(TypeBK.Marathone, value) });
+                    foras.Add(new Handicap { Name = name, Draw = ConvertToValueBK(TypeBK.Xbet, value) });
                 }
             }
             else
             {
                 if (typeEv.Equals("Team1"))
                 {
-                    fora.Team1 = ConvertToValueBK(TypeBK.Marathone, value);
+                    fora.Team1 = ConvertToValueBK(TypeBK.Xbet, value);
                 }
                 else if (typeEv.Equals("Team2"))
                 {
-                    fora.Team2 = ConvertToValueBK(TypeBK.Marathone, value);
+                    fora.Team2 = ConvertToValueBK(TypeBK.Xbet, value);
                 }
                 else
                 {
-                    fora.Draw = ConvertToValueBK(TypeBK.Marathone, value);
+                    fora.Draw = ConvertToValueBK(TypeBK.Xbet, value);
                 }
             }
         }

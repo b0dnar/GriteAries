@@ -170,6 +170,11 @@ namespace GriteAries.BK.Marathone
                         dataEvent.MinuteMatch = time;
                     }
                 }
+
+                if (dataEvent.MinuteMatch > MaxMinuteMatchFootball)
+                {
+                    return null;
+                }
             }
             catch (Exception e)
             {

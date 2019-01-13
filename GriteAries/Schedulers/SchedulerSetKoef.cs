@@ -4,6 +4,7 @@ using System;
 using Quartz;
 using Quartz.Impl;
 using GriteAries.Models;
+using Nito.AsyncEx;
 
 namespace GriteAries.Schedulers
 {
@@ -31,6 +32,7 @@ namespace GriteAries.Schedulers
 
     public class RunSetKoef : IJob
     {
+        private readonly AsyncLock _mutex = new AsyncLock();
         Job _job = new Job();
         public async Task Execute(IJobExecutionContext context)
         {
@@ -42,10 +44,10 @@ namespace GriteAries.Schedulers
                 return;
             }
 
-            await allFootball.ParallelForEachAsync(async x =>
+            using (await _mutex.LockAsync())
             {
-               await _job.SetKoef(x);
-            }, maxThread);
+                await allFootball.ParallelForEachAsync(async x => { await _job.SetKoef(x); }, maxThread);
+            }
         }
     }
 }

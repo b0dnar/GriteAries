@@ -15,6 +15,8 @@ namespace GriteAries
     {
         private MarathoneParse marathone;
         private XBetParse xbet;
+        private const int maxMinuteFootball = 85;
+        private int countDelMatch = 0;
 
         public Job()
         {
@@ -76,11 +78,11 @@ namespace GriteAries
                 listData.Add(item, val);
             }
 
-            if(listData.Count == 0)
+            if (listData.Count == 0)
             {
                 return null;
             }
-            else if(listData.Count == 1)
+            else if (listData.Count == 1)
             {
                 return listData.Keys.ToList()[0];
             }
@@ -113,31 +115,36 @@ namespace GriteAries
             }, maxThread);
         }
 
+
         public async Task EquilsData()
         {
-            await Task.Run(() =>
-            {
-                List<DataArbitrash> maxDatas = new List<DataArbitrash>();
-                var allFootball = Container.GetUsedDatas(TypeSport.Football);
+            const int valDelMatch = 60;
+            List<DataArbitrash> maxDatas = new List<DataArbitrash>();
+            var allFootball = Container.GetUsedDatas(TypeSport.Football);
 
+            lock (allFootball)
+            {
                 foreach (var item in allFootball)
                 {
                     var data = GetMaxData(item.footballUsedData);
                     maxDatas.Add(data);
                 }
+            }
 
-                foreach (var data in maxDatas)
-                {
-                    SearchArbitrash(data);
+            foreach (var data in maxDatas)
+            {
+                SearchArbitrash(data);
+            }
 
-                    if(data.Arbitrashes.Count > 0)
-                    {
+            var listArbitrash = maxDatas.Where(x => x.Arbitrashes.Count > 0).Select(x => x).ToList();
+            Container.SetDataArbitrash(listArbitrash);
 
-                    }
-                }
-
-                
-            });
+            countDelMatch++;
+            if (countDelMatch == valDelMatch)
+            {
+                countDelMatch = 0;
+                await DeleteOldMatches();
+            }
         }
 
         private DataArbitrash GetMaxData(List<Data> datas)
@@ -190,12 +197,16 @@ namespace GriteAries
 
             foreach (var item in allName)
             {
-                var listTot = allTotals.Where(list => list.Any(s => s.Name == item)).Select(x => x).ToList();//.SelectMany(d => d).ToList();
+                var listTot = (from a in allTotals
+                               from b in a
+                               where b.Name == item
+                               select b).ToList();
+
                 Total total = new Total();
 
                 total.Name = item;
-                //total.Over = GetMaxValue(listTot.Select(x => x.Over).ToList());
-                //total.Under = GetMaxValue(listTot.Select(x => x.Under).ToList());
+                total.Over = GetMaxValue(listTot.Select(x => x.Over).ToList());
+                total.Under = GetMaxValue(listTot.Select(x => x.Under).ToList());
 
                 totals.Add(total);
             }
@@ -219,7 +230,11 @@ namespace GriteAries
 
             foreach (var item in allName)
             {
-                var listTot = allTotals.Where(list => list.Any(s => s.Name == item)).SelectMany(d => d).ToList();
+                var listTot = (from a in allTotals
+                               from b in a
+                               where b.Name == item
+                               select b).ToList();
+
                 Total3Event total = new Total3Event();
 
                 total.Name = item;
@@ -249,7 +264,11 @@ namespace GriteAries
 
             foreach (var item in allName)
             {
-                var listTot = allForas.Where(list => list.Any(s => s.Name == item)).SelectMany(d => d).ToList();
+                var listTot = (from a in allForas
+                               from b in a
+                               where b.Name == item
+                               select b).ToList();
+
                 Fora fora = new Fora();
 
                 fora.Name = item;
@@ -278,7 +297,11 @@ namespace GriteAries
 
             foreach (var item in allName)
             {
-                var listTot = allForas.Where(list => list.Any(s => s.Name == item)).SelectMany(d => d).ToList();
+                var listTot = (from a in allForas
+                               from b in a
+                               where b.Name == item
+                               select b).ToList();
+
                 Handicap fora = new Handicap();
 
                 fora.Name = item;
@@ -296,19 +319,19 @@ namespace GriteAries
         {
             if (values.Count == 0)
             {
-                return new ValueBK(bk:TypeBK.Xbet);
+                return new ValueBK(bk: TypeBK.Xbet);
             }
 
             ValueBK maxValue = null;
 
             for (int i = 0; i < values.Count; i++)
             {
-                if(values[i] == null)
+                if (values[i] == null)
                 {
                     continue;
                 }
 
-                if(maxValue == null)
+                if (maxValue == null)
                 {
                     maxValue = values[i];
                     continue;
@@ -327,7 +350,7 @@ namespace GriteAries
         private void SearchArbitrash(DataArbitrash data)
         {
             var arbitr = Arbitrash3Event(data.P1, data.X, data.P2);
-            if(arbitr != null)
+            if (arbitr != null)
             {
                 arbitr.Name = "P1XP2";
                 data.Arbitrashes.Add(arbitr);
@@ -400,7 +423,7 @@ namespace GriteAries
             foreach (var item in data.Handicaps)
             {
                 var arb = Arbitrash3Event(item.Team1, item.Draw, item.Team2);
-                if(arb != null)
+                if (arb != null)
                 {
                     arb.Name = $"Handicap {item.Name}";
                     data.Arbitrashes.Add(arb);
@@ -415,11 +438,11 @@ namespace GriteAries
                 return null;
             }
 
-            const int maxProc = 100;
+            const int maxProc = 100, maxStavka = 100;
             var sumKoef = maxProc / a1.Value + maxProc / a2.Value + maxProc / a3.Value;
             var difer = maxProc - sumKoef;
 
-            if (difer < 0 || difer > 20)
+            if (difer < 4 || difer > 20)
             {
                 return null;
             }
@@ -428,6 +451,9 @@ namespace GriteAries
             arbitrash.Koef1 = a1;
             arbitrash.Koef2 = a2;
             arbitrash.Koef3 = a3;
+            arbitrash.Stavka1 = (int)(maxStavka / a1.Value);
+            arbitrash.Stavka2 = (int)(maxStavka / a2.Value);
+            arbitrash.Stavka3 = (int)(maxStavka / a3.Value);
             arbitrash.Percent = difer;
 
             return arbitrash;
@@ -440,11 +466,11 @@ namespace GriteAries
                 return null;
             }
 
-            const int maxProc = 100;
+            const int maxProc = 100, maxStavka = 100;
             var sumKoef = maxProc / a1.Value + maxProc / a2.Value;
             var difer = maxProc - sumKoef;
 
-            if (difer < 0 || difer > 20)//sumKoef >= maxProc )
+            if (difer < 4 || difer > 20)
             {
                 return null;
             }
@@ -452,10 +478,70 @@ namespace GriteAries
             Arbitrash arbitrash = new Arbitrash(TypeArbitrash.Event2);
             arbitrash.Koef1 = a1;
             arbitrash.Koef2 = a2;
-            arbitrash.Percent = difer;//maxProc - sumKoef;
+            arbitrash.Stavka1 = (int)(maxStavka / a1.Value);
+            arbitrash.Stavka2 = (int)(maxStavka / a2.Value);
+            arbitrash.Percent = difer;
 
             return arbitrash;
         }
 
+
+        public async Task DeleteOldMatches()
+        {
+            await Task.Run(() =>
+            {
+                var allFootball = Container.GetUsedDatas(TypeSport.Football);
+
+                lock (allFootball)
+                {
+                    var delList = (from usedData in allFootball
+                                   from data in usedData.footballUsedData
+                                   where data.Bukmeker == TypeBK.Xbet && data.MinuteMatch > maxMinuteFootball
+                                   select usedData).ToList();
+
+                    if (delList.Count == 0)
+                    {
+                        return;
+                    }
+
+                    foreach (var item in delList)
+                    {
+                        allFootball.Remove(item);
+                    }
+                }
+            });
+        }
+
+
+        public List<DataPrint> GetDataPrintFootball()
+        {
+            List<DataPrint> listDataPrint = new List<DataPrint>();
+            var listArbitrash = Container.GetDataArbitrash();
+
+            foreach (var data in listArbitrash)
+            {
+                foreach (var arbitrash in data.Arbitrashes)
+                {
+                    DataPrint dataPrint = new DataPrint();
+
+                    dataPrint.Koef1 = arbitrash.Koef1;
+                    dataPrint.Koef2 = arbitrash.Koef2;
+                    dataPrint.Koef3 = arbitrash.Koef3;
+                    dataPrint.Liga = data.Liga;
+                    dataPrint.NameArbitrash = arbitrash.Name;
+                    dataPrint.NameMatches = $"{data.Team1} - {data.Team2}";
+                    dataPrint.Percent = arbitrash.Percent;
+                    dataPrint.Stavka1 = arbitrash.Stavka1;
+                    dataPrint.Stavka2 = arbitrash.Stavka2;
+                    dataPrint.Stavka3 = arbitrash.Stavka3;
+                    dataPrint.State2Event = arbitrash.Type == TypeArbitrash.Event2 ? true : false;
+                    dataPrint.Urls = data.ListUrl.Keys.ToList();
+
+                    listDataPrint.Add(dataPrint);
+                }
+            }
+
+            return listDataPrint.OrderByDescending(x => x.Percent).ToList();
+        }
     }
 }

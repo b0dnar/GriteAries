@@ -41,6 +41,9 @@ namespace GriteAries.Models
         public ValueBK Koef1 { get; set; }
         public ValueBK Koef2 { get; set; }
         public ValueBK Koef3 { get; set; }
+        public int Stavka1 { get; set; }
+        public int Stavka2 { get; set; }
+        public int Stavka3 { get; set; }
         public float Percent { get; set; }
 
         public Arbitrash(TypeArbitrash type)

@@ -8,7 +8,7 @@ namespace GriteAries.BK
 {
     public abstract class Bukmeker
     {
-
+        public const int MaxMinuteMatchFootball = 85;
         public string GetOppositeForaName(string name)
         {
             if (name.Contains("-"))

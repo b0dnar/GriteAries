@@ -4,15 +4,27 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using GriteAries.Models;
+
 
 namespace GriteAries.Controllers
 {
+    
     public class ValuesController : ApiController
     {
+        Job _job; 
         // GET api/values
-        public IEnumerable<string> Get()
+        public List<DataPrint> Get()
         {
-            return new string[] { "value1", "value2" };
+            _job = new Job();
+            var list = _job.GetDataPrintFootball();
+
+            if (list.Count == 0)
+            {
+                return null;
+            }
+
+            return list;
         }
 
         // GET api/values/5
